@@ -3,119 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Family Command Center</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Family Hub Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #0a0a0a; --surface: #1a1a1a; --text: #ffffff;
-            --accent: #3498db; --nav-bg: #111111;
-        }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        :root { --bg: #000; --card: #121212; --text: #fff; --accent: #3498db; --dim: #888; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
         
-        /* Main Dashboard Area */
-        .dashboard { flex-grow: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; overflow-y: auto; padding-bottom: 90px; }
-        .widget { background: var(--surface); border-radius: 20px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .widget h2 { margin-top: 0; font-size: 1.2rem; color: #aaa; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        /* Navigation & Layout */
+        .app-container { display: flex; flex-direction: column; height: 100vh; }
+        .app-view { flex-grow: 1; padding: 20px; overflow-y: auto; display: none; padding-bottom: 100px; }
+        .active-view { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Bottom App Navigation */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #333; z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #888; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
-        .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 1.5rem; margin-bottom: 5px; }
+        /* Dashboard Widgets */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .widget { background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid #222; }
+        .widget h3 { margin: 0 0 15px 0; font-size: 1rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Screensaver Overlay */
-        #screensaver { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; background-size: cover; background-position: center; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 1s ease-in-out; }
-        #screensaver.active { opacity: 1; pointer-events: auto; }
-        .ss-clock { font-size: 8rem; font-weight: 700; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); margin: 0; }
-        .ss-date { font-size: 2rem; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
-        .ss-notification { margin-top: 40px; background: rgba(0,0,0,0.6); padding: 15px 30px; border-radius: 30px; font-size: 1.2rem; backdrop-filter: blur(5px); }
+        /* Screensaver */
+        #screensaver { position: fixed; inset: 0; background: #000; z-index: 2000; display: none; background-size: cover; background-position: center; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        #screensaver.show { display: flex; animation: fadeIn 1s; }
+        .ss-time { font-size: 10rem; font-weight: 700; margin: 0; }
+        .ss-info { font-size: 2rem; color: #ccc; }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(15,15,15,0.95); display: flex; justify-content: space-around; align-items: center; backdrop-filter: blur(10px); border-top: 1px solid #222; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--dim); font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: var(--accent); transform: translateY(-5px); }
+        .nav-icon { font-size: 1.8rem; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
-    <!-- Screensaver -->
-    <div id="screensaver">
-        <h1 class="ss-clock" id="ss-time">00:00</h1>
-        <div class="ss-date" id="ss-date">Monday, May 4</div>
-        <div class="ss-notification">🔔 Next: Soccer Practice at 4:00 PM</div>
+    <!-- Screensaver Layer -->
+    <div id="screensaver" onclick="wakeUp()">
+        <h1 class="ss-time" id="ss-clock">00:00</h1>
+        <div class="ss-info" id="ss-date">Monday, May 4</div>
+        <div id="ss-notify" style="margin-top:20px; font-size: 1.5rem;">✨ No upcoming alerts</div>
     </div>
 
-    <!-- Main Dashboard -->
-    <div class="dashboard">
-        <div class="widget">
-            <h2>Today's Schedule</h2>
-            <p>12:30 PM - Lunch with Sarah</p>
-            <p>04:00 PM - Soccer Practice (Kids)</p>
+    <div class="app-container">
+        <!-- 1. HOME DASHBOARD -->
+        <div id="view-home" class="app-view active-view">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h1 id="main-clock" style="font-size:3rem; margin:0;">00:00</h1>
+                <div id="weather-widget" style="text-align:right">
+                    <div style="font-size:1.5rem">72°F</div>
+                    <div style="color:var(--dim)">Sunny, London</div>
+                </div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="widget"><h3>Next Event</h3><p id="dash-cal">Syncing Google...</p></div>
+                <div class="widget"><h3>Top Chores</h3><p>• Empty Dishwasher<br>• Walk Dog</p></div>
+                <div class="widget"><h3>Tonight's Dinner</h3><p>Taco Tuesday 🌮</p></div>
+            </div>
         </div>
-        <div class="widget">
-            <h2>Chores & Tasks</h2>
-            <p>⬜ Empty Dishwasher</p>
-            <p>✅ Feed the Dog</p>
-        </div>
-        <div class="widget">
-            <h2>Meal Plan</h2>
-            <p><strong>Dinner:</strong> Spaghetti Bolognese</p>
-        </div>
-        <div class="widget">
-            <h2>Weather</h2>
-            <p>Current: 65°F, Partly Cloudy ⛅</p>
-        </div>
-    </div>
 
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <div class="nav-item active"><span class="nav-icon">🏠</span>Home</div>
-        <div class="nav-item"><span class="nav-icon">📅</span>Calendar</div>
-        <div class="nav-item"><span class="nav-icon">✅</span>Tasks</div>
-        <div class="nav-item"><span class="nav-icon">🍲</span>Meals</div>
-        <div class="nav-item"><span class="nav-icon">📝</span>Notes</div>
-    </nav>
+        <!-- 2. CALENDAR VIEW -->
+        <div id="view-calendar" class="app-view">
+            <h2>Shared Calendar</h2>
+            <div id="calendar-sync-status">Connected to Google Calendar</div>
+            <!-- Google Calendar iFrame can go here -->
+        </div>
+
+        <!-- 3. TASKS VIEW -->
+        <div id="view-tasks" class="app-view">
+            <h2>Chore List & Rewards</h2>
+            <div class="widget">Add chores via mobile app to see them here.</div>
+        </div>
+
+        <!-- 4. MEALS VIEW -->
+        <div id="view-meals" class="app-view">
+            <h2>Meal Planner & Pantry</h2>
+            <div class="widget">Grocery List: Milk, Eggs, Bread</div>
+        </div>
+
+        <!-- 5. NOTES VIEW -->
+        <div id="view-notes" class="app-view">
+            <h2>Family Notes</h2>
+            <textarea style="width:100%; height:200px; background:#222; color:#fff; border-radius:10px; padding:10px; border:none;"></textarea>
+        </div>
+
+        <!-- NAVIGATION -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span>Home</div>
+            <div class="nav-item" onclick="switchTab('calendar', this)"><span class="nav-icon">📅</span>Calendar</div>
+            <div class="nav-item" onclick="switchTab('tasks', this)"><span class="nav-icon">✅</span>Tasks</div>
+            <div class="nav-item" onclick="switchTab('meals', this)"><span class="nav-icon">🍲</span>Meals</div>
+            <div class="nav-item" onclick="switchTab('notes', this)"><span class="nav-icon">📝</span>Notes</div>
+        </nav>
+    </div>
 
     <script>
-        // --- CLOCK LOGIC ---
-        function updateClock() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const dateStr = now.toLocaleDateString([], {weekday: 'long', month: 'long', day: 'numeric'});
-            document.getElementById('ss-time').innerText = timeStr;
-            document.getElementById('ss-date').innerText = dateStr;
+        // --- 1. NAVIGATION LOGIC ---
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active-view'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('view-' + tabId).classList.add('active-view');
+            el.classList.add('active');
+            resetIdle();
         }
-        setInterval(updateClock, 1000);
-        updateClock();
 
-        // --- SCREENSAVER LOGIC ---
-        let idleTime = 0;
-        const IDLE_TIMEOUT = 30; // seconds before screensaver kicks in
+        // --- 2. CLOCK & WEATHER ---
+        function updateTime() {
+            const now = new Date();
+            const time = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('main-clock').innerText = time;
+            document.getElementById('ss-clock').innerText = time;
+            document.getElementById('ss-date').innerText = now.toLocaleDateString([], {weekday: 'long', month: 'long', day: 'numeric'});
+            
+            // 7:30 AM Alert Logic
+            if(now.getHours() === 7 && now.getMinutes() === 30 && now.getSeconds() === 0) {
+                alert("Good Morning! Check your tasks for today.");
+            }
+        }
+        setInterval(updateTime, 1000);
 
-        // Mock photos for screensaver
+        // --- 3. SCREENSAVER & PHOTOS ---
+        let idleSeconds = 0;
+        const IDLE_LIMIT = 60; // 1 minute
         const photos = [
             'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
             'https://images.unsplash.com/photo-1470770841072-f978cf4d019e'
         ];
-        let photoIndex = 0;
 
-        function resetIdleTimer() {
-            idleTime = 0;
-            document.getElementById('screensaver').classList.remove('active');
+        function resetIdle() { 
+            idleSeconds = 0; 
+            document.getElementById('screensaver').classList.remove('show');
         }
 
-        // Listen for interaction to wake up
-        window.addEventListener('mousemove', resetIdleTimer);
-        window.addEventListener('touchstart', resetIdleTimer);
-        window.addEventListener('click', resetIdleTimer);
+        function wakeUp() { resetIdle(); }
 
         setInterval(() => {
-            idleTime++;
-            if (idleTime >= IDLE_TIMEOUT) {
+            idleSeconds++;
+            if(idleSeconds >= IDLE_LIMIT) {
                 const ss = document.getElementById('screensaver');
-                if (!ss.classList.contains('active')) {
-                    // Change photo and activate
-                    ss.style.backgroundImage = `url(${photos[photoIndex]})`;
-                    photoIndex = (photoIndex + 1) % photos.length;
-                    ss.classList.add('active');
-                }
+                ss.style.backgroundImage = `url(${photos[Math.floor(Math.random()*photos.length)]})`;
+                ss.classList.add('show');
             }
         }, 1000);
+
+        // Listen for activity
+        ['mousedown', 'touchstart', 'keypress'].forEach(e => window.addEventListener(e, resetIdle));
+
+        // --- 4. WHERE TO ADD APIS ---
+        
+        /* 
+           WEATHER: 
+           Sign up at OpenWeatherMap.org. Replace the weather-widget content with a 
+           fetch() call inside a function that runs every 30 mins.
+        */
+
+        /* 
+           CALENDAR: 
+           To sync with your phone, go to Google Calendar > Settings > Integrate.
+           Copy the "Public URL" or "Secret iFrame" and paste it into the Calendar View div.
+        */
+
+        /* 
+           SYNCING (MOBILE TO DISPLAY):
+           This is where you add Firebase. 
+           1. Go to console.firebase.google.com
+           2. Add a 'Web App'
+           3. Paste the 'firebaseConfig' object here.
+           4. Use 'onValue' to listen for changes to your chore list.
+        */
     </script>
 </body>
 </html>
