@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
-    <title>Family Hub Pro V11</title>
+    <title>Family Hub Pro V12</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -21,7 +21,7 @@
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; transition: background 0.5s, color 0.5s; }
         
         #brightness-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10001; background: black; opacity: 0; transition: opacity 2s; }
-        .tab-content { flex-grow: 1; display: none; height: 100%; overflow-y: auto; padding-bottom: 120px; }
+        .tab-content { flex-grow: 1; display: none; height: 100%; overflow-y: auto; padding-bottom: 140px; }
         .tab-content.active { display: block; }
 
         /* HOME GRID */
@@ -31,33 +31,34 @@
         .tile { background: var(--card); border-radius: 24px; padding: 20px; border: 1px solid rgba(128,128,128,0.1); }
         
         /* WEATHER */
+        .weather-main { font-size: 2.8rem; font-weight: 700; display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
         .weather-forecast { display: flex; gap: 15px; margin-top: 10px; }
-        .forecast-day { text-align: center; flex: 1; font-size: 0.8rem; color: var(--dim); }
+        .forecast-day { text-align: center; flex: 1; font-size: 0.85rem; color: var(--dim); }
 
-        /* CALENDAR TAB */
-        .calendar-legend { display: flex; justify-content: center; gap: 20px; padding: 20px; background: var(--card); border-bottom: 1px solid rgba(128,128,128,0.1); }
-        .legend-item { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+        /* CALENDAR */
+        .calendar-legend { display: flex; justify-content: center; gap: 20px; padding: 15px; background: var(--card); border-bottom: 1px solid rgba(128,128,128,0.1); flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.9rem; }
         .dot { width: 12px; height: 12px; border-radius: 50%; }
         .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; padding: 20px; }
         .day-col { background: var(--card); border-radius: 12px; border: 1px solid rgba(128,128,128,0.1); min-height: 500px; }
         .day-header { text-align: center; padding: 12px 5px; border-bottom: 1px solid rgba(128,128,128,0.1); }
-        .cal-event { background: rgba(128,128,128,0.1); border-left: 4px solid var(--c); padding: 8px; border-radius: 6px; font-size: 0.85rem; margin: 5px; color: var(--text); }
+        .cal-event { background: rgba(128,128,128,0.1); border-left: 4px solid var(--c); padding: 8px; border-radius: 6px; font-size: 0.8rem; margin: 5px; color: var(--text); }
 
-        /* FUN TILE */
-        .fun-text { font-style: italic; color: var(--accent); margin-bottom: 10px; font-size: 0.95rem; }
+        /* LISTS */
+        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--card); margin-bottom: 10px; border-radius: 16px; border: 1px solid rgba(128,128,128,0.1); font-size: 1.1rem; }
+        .delete-btn { color: #e74c3c; background: none; border: none; font-size: 1.4rem; cursor: pointer; padding: 5px 15px; }
+        .edit-btn { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
 
-        /* UI ELEMENTS */
-        .add-btn-round { background: var(--accent); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 1.5rem; cursor: pointer; }
-        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: var(--card); margin-bottom: 8px; border-radius: 16px; border: 1px solid rgba(128,128,128,0.1); }
-        .delete-btn { color: #e74c3c; background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 5px 10px; }
+        /* NAVIGATION - BIGGER ICONS */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 100px; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(128,128,128,0.1); z-index: 100; }
+        .nav-item { color: var(--dim); text-align: center; flex: 1; cursor: pointer; transition: 0.3s; }
+        .nav-icon { font-size: 2.2rem; display: block; margin-bottom: 4px; }
+        .nav-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; }
+        .nav-item.active { color: var(--accent); transform: translateY(-5px); }
 
         /* SCREENSAVER */
         #screensaver { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: none; justify-content: center; align-items: center; background-size: cover; background-position: center; }
         #ss-clock { font-size: 10rem; font-weight: 300; z-index: 10000; color: white; text-shadow: 0 0 30px rgba(0,0,0,0.8); }
-
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(128,128,128,0.1); z-index: 100; }
-        .nav-item { color: var(--dim); text-align: center; flex: 1; cursor: pointer; font-size: 0.7rem; }
-        .nav-item.active { color: var(--accent); }
     </style>
 </head>
 <body onmousemove="resetTimer()" onclick="resetTimer()" ontouchstart="resetTimer()">
@@ -71,22 +72,23 @@
             <div class="header-tile">
                 <div class="clock-tile"><h1 id="clock">00:00</h1><p id="date-string">...</p></div>
                 <div id="weather-widget" style="text-align: right;">
-                    <div id="temp" style="font-size: 2.5rem; font-weight: 700;">--°</div>
-                    <div id="weather-desc" style="color:var(--dim)">WR5 2PB</div>
+                    <div class="weather-main"><span id="w-icon">☀️</span> <span id="temp">--°</span></div>
+                    <div id="weather-desc" style="color:var(--accent); font-weight: 700; font-size: 1.1rem; margin-bottom: 5px;">Worcester</div>
+                    <div id="w-condition" style="color:var(--dim); font-size: 0.9rem; text-transform: capitalize;">Checking sky...</div>
                     <div class="weather-forecast" id="forecast-cont"></div>
                 </div>
             </div>
-            <div class="tile"><h3>🍲 Dinner</h3><div id="home-dinner" style="font-size: 1.4rem;">...</div></div>
+            <div class="tile"><h3>🍲 Today's Dinner</h3><div id="home-dinner" style="font-size: 1.6rem; color: var(--accent);">...</div></div>
             <div class="tile">
                 <h3>✨ Daily Fun</h3>
-                <div id="daily-quote" class="fun-text">"Loading quote..."</div>
-                <div id="daily-joke" style="font-size: 0.9rem; border-top: 1px solid rgba(128,128,128,0.1); pt:10px;">Loading joke...</div>
+                <div id="daily-quote" style="font-style: italic; color: var(--accent); margin-bottom: 10px; font-size: 0.9rem;">"Loading..."</div>
+                <div id="daily-joke" style="font-size: 0.85rem; border-top: 1px solid rgba(128,128,128,0.1); padding-top:10px;">Loading...</div>
             </div>
             <div class="tile" style="grid-column: 1 / span 2;"><h3>📝 Latest Note</h3><div id="home-note-preview">...</div></div>
         </div>
     </div>
 
-    <!-- CALENDAR TAB -->
+    <!-- CALENDAR -->
     <div id="calendar" class="tab-content">
         <div class="calendar-legend">
             <div class="legend-item"><div class="dot" style="background:var(--Michelle)"></div>Michelle</div>
@@ -97,23 +99,30 @@
         <div id="week-grid-container"></div>
     </div>
 
-    <!-- OTHER TABS -->
-    <div id="meals" class="tab-content"><div style="padding:20px;"><h2>Meals</h2><div id="meal-list"></div></div></div>
-    <div id="tasks" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between;"><h2>Tasks</h2><button class="add-btn-round" onclick="addTask()">+</button></div><div id="task-list" style="padding:0 20px;"></div></div>
-    <div id="groceries" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between;"><h2>Groceries</h2><button class="add-btn-round" onclick="addGrocery()">+</button></div><div id="grocery-list" style="padding:0 20px;"></div></div>
-    <div id="notes" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between;"><h2>Notes</h2><button class="add-btn-round" onclick="addNote()">+</button></div><div id="note-list" style="padding:0 20px;"></div></div>
+    <!-- MEALS -->
+    <div id="meals" class="tab-content"><div style="padding:20px;"><h2>Weekly Meal Planner</h2><div id="meal-list"></div></div></div>
 
+    <!-- TASKS -->
+    <div id="tasks" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between;"><h2>Tasks</h2><button class="edit-btn" onclick="addTask()" style="font-size: 1.2rem;">+ New Task</button></div><div id="task-list" style="padding:0 20px;"></div></div>
+
+    <!-- GROCERIES -->
+    <div id="groceries" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between;"><h2>Shopping List</h2><button class="edit-btn" onclick="addGrocery()" style="font-size: 1.2rem;">+ Add Item</button></div><div id="grocery-list" style="padding:0 20px;"></div></div>
+
+    <!-- NOTES -->
+    <div id="notes" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between;"><h2>Notes</h2><button class="edit-btn" onclick="addNote()" style="font-size: 1.2rem;">+ Add Note</button></div><div id="note-list" style="padding:0 20px;"></div></div>
+
+    <!-- BIG NAV -->
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', this)">🏠<br>HOME</div>
-        <div class="nav-item" onclick="switchTab('calendar', this)">📅<br>CALENDAR</div>
-        <div class="nav-item" onclick="switchTab('meals', this)">🍲<br>MEALS</div>
-        <div class="nav-item" onclick="switchTab('tasks', this)">✅<br>TASKS</div>
-        <div class="nav-item" onclick="switchTab('groceries', this)">🛒<br>SHOP</div>
-        <div class="nav-item" onclick="switchTab('notes', this)">📝<br>NOTES</div>
+        <div class="nav-item active" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span class="nav-label">HOME</span></div>
+        <div class="nav-item" onclick="switchTab('calendar', this)"><span class="nav-icon">📅</span><span class="nav-label">CALENDAR</span></div>
+        <div class="nav-item" onclick="switchTab('meals', this)"><span class="nav-icon">🍲</span><span class="nav-label">MEALS</span></div>
+        <div class="nav-item" onclick="switchTab('tasks', this)"><span class="nav-icon">✅</span><span class="nav-label">TASKS</span></div>
+        <div class="nav-item" onclick="switchTab('groceries', this)"><span class="nav-icon">🛒</span><span class="nav-label">SHOP</span></div>
+        <div class="nav-item" onclick="switchTab('notes', this)"><span class="nav-icon">📝</span><span class="nav-label">NOTES</span></div>
     </nav>
 
     <script>
-        // CONFIG
+        // --- PRESERVED CONFIG ---
         const GOOGLE_API_KEY = 'AIzaSyCBb3Uu--Sr21o65TUddUBIPfLfQwZsV_o';
         const FAMILY_CALENDARS = {
             Michelle: 'malvcomp@gmail.com',
@@ -132,46 +141,61 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // JOKE & QUOTE
-        async function fetchDailyFun() {
-            try {
-                const jRes = await fetch('https://v2.jokeapi.dev/joke/Any?safe-mode&type=single');
-                const jData = await jRes.json();
-                document.getElementById('daily-joke').innerText = jData.joke || "Why did the calendar go to therapy? Its days were numbered.";
-                
-                const qRes = await fetch('https://dummyjson.com/quotes/random');
-                const qData = await qRes.json();
-                document.getElementById('daily-quote').innerText = `"${qData.quote}" - ${qData.author}`;
-            } catch(e) { console.log("Fun Error", e); }
-        }
+        // --- WEATHER LOGIC ---
+        const weatherMap = {
+            0: ["☀️", "Clear Sky"], 1: ["🌤️", "Partly Cloudy"], 2: ["⛅", "Cloudy"], 3: ["☁️", "Overcast"],
+            45: ["🌫️", "Foggy"], 48: ["🌫️", "Foggy"], 51: ["🌦️", "Light Drizzle"], 61: ["🌧️", "Rainy"],
+            63: ["🌧️", "Rain"], 80: ["🌧️", "Showers"], 95: ["⛈️", "Thunderstorm"]
+        };
 
-        // WEATHER FOR WR5 2PB
         async function fetchWeather() {
             try {
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=52.16&longitude=-2.2&daily=weathercode,temperature_2m_max&current_weather=true&timezone=Europe%2FLondon');
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=52.19&longitude=-2.22&daily=weathercode,temperature_2m_max&current_weather=true&timezone=Europe%2FLondon');
                 const data = await res.json();
-                document.getElementById('temp').innerText = Math.round(data.current_weather.temperature) + '°';
+                const cur = data.current_weather;
+                const info = weatherMap[cur.weathercode] || ["☀️", "Clear"];
+                
+                document.getElementById('temp').innerText = Math.round(cur.temperature) + '°';
+                document.getElementById('w-icon').innerText = info[0];
+                document.getElementById('w-condition').innerText = info[1];
+                
                 let fHtml = '';
-                const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+                const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
                 for(let i=1; i<4; i++) {
                     let d = new Date(); d.setDate(d.getDate() + i);
-                    fHtml += `<div class="forecast-day">${days[d.getDay()]}<br><b>${Math.round(data.daily.temperature_2m_max[i])}°</b></div>`;
+                    let icon = weatherMap[data.daily.weathercode[i]] ? weatherMap[data.daily.weathercode[i]][0] : "☀️";
+                    fHtml += `<div class="forecast-day">${dayNames[d.getDay()]}<br>${icon}<br><b>${Math.round(data.daily.temperature_2m_max[i])}°</b></div>`;
                 }
                 document.getElementById('forecast-cont').innerHTML = fHtml;
-            } catch(e) {}
+            } catch(e) { console.log(e); }
         }
 
-        // CALENDAR LOGIC
+        // --- MEALS LOGIC (FIXED) ---
+        const weekDays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+        db.ref('meals').on('value', snap => {
+            const meals = snap.val() || {};
+            const list = document.getElementById('meal-list'); list.innerHTML = '';
+            weekDays.forEach(day => {
+                const div = document.createElement('div'); div.className = 'list-item';
+                div.innerHTML = `<div><b>${day}</b><br><span style="color:var(--dim)">${meals[day] || 'Tap to set meal...'}</span></div>
+                                 <button class="edit-btn" onclick="setMeal('${day}')">Edit</button>`;
+                list.appendChild(div);
+            });
+            const today = new Date().toLocaleDateString('en-US', {weekday: 'long'});
+            document.getElementById('home-dinner').innerText = meals[today] || "Not planned yet";
+        });
+        window.setMeal = (day) => { const n = prompt(`What's for dinner on ${day}?`); if(n) db.ref('meals/'+day).set(n); };
+
+        // --- CALENDAR LOGIC ---
         async function fetchEvents(name) {
-            const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(FAMILY_CALENDARS[name])}/events?key=${GOOGLE_API_KEY}&timeMin=${new Date().toISOString()}&singleEvents=true&orderBy=startTime&maxResults=15`;
+            const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(FAMILY_CALENDARS[name])}/events?key=${GOOGLE_API_KEY}&timeMin=${new Date().toISOString()}&singleEvents=true&orderBy=startTime&maxResults=10`;
             const res = await fetch(url);
             const data = await res.json();
             return data.items || [];
         }
-
         async function buildWeeklyCalendar() {
             const container = document.getElementById('week-grid-container');
-            container.innerHTML = '<p style="text-align:center; padding:50px;">Syncing Family Calendar...</p>';
+            container.innerHTML = '<p style="text-align:center; padding:50px;">Refreshing Calendars...</p>';
             let allEvs = [];
             for (const name in FAMILY_CALENDARS) {
                 const evs = await fetchEvents(name);
@@ -186,52 +210,80 @@
             days.forEach(day => {
                 html += `<div class="day-col"><div class="day-header"><small>${day.toLocaleDateString('en-GB',{weekday:'short'})}</small><br><b>${day.getDate()}</b></div>`;
                 allEvs.filter(e => e.key === day.toDateString()).forEach(e => {
-                    html += `<div class="cal-event" style="--c:var(--${e.person})"><b>${e.summary}</b><br><small>${e.person}</small></div>`;
+                    html += `<div class="cal-event" style="--c:var(--${e.person})"><b>${e.summary}</b></div>`;
                 });
                 html += '</div>';
             });
             container.innerHTML = html + '</div>';
         }
 
-        // FIREBASE DATA (NOTES WITH DELETE)
-        window.addNote = () => { const text = prompt("Note:"); if(text) db.ref('notes').push({ text, time: new Date().toLocaleTimeString() }); };
+        // --- FIREBASE TASKS/GROCERIES/NOTES ---
+        window.addTask = () => { const t = prompt("New Task:"); if(t) db.ref('tasks').push({ text: t, done: false }); };
+        db.ref('tasks').on('value', snap => {
+            const list = document.getElementById('task-list'); list.innerHTML = '';
+            const data = snap.val();
+            for(let id in data) {
+                const div = document.createElement('div'); div.className = 'list-item';
+                div.innerHTML = `<span style="text-decoration:${data[id].done?'line-through':''}" onclick="db.ref('tasks/${id}').update({done:${!data[id].done}})">${data[id].text}</span>
+                                 <button class="delete-btn" onclick="db.ref('tasks/${id}').remove()">✕</button>`;
+                list.appendChild(div);
+            }
+        });
+
+        window.addGrocery = () => { const t = prompt("Add to shop:"); if(t) db.ref('groceries').push({ text: t, done: false }); };
+        db.ref('groceries').on('value', snap => {
+            const list = document.getElementById('grocery-list'); list.innerHTML = '';
+            const data = snap.val();
+            for(let id in data) {
+                const div = document.createElement('div'); div.className = 'list-item';
+                div.innerHTML = `<span style="text-decoration:${data[id].done?'line-through':''}" onclick="db.ref('groceries/${id}').update({done:${!data[id].done}})">${data[id].text}</span>
+                                 <button class="delete-btn" onclick="db.ref('groceries/${id}').remove()">✕</button>`;
+                list.appendChild(div);
+            }
+        });
+
+        window.addNote = () => { const text = prompt("Note:"); if(text) db.ref('notes').push({ text }); };
         db.ref('notes').on('value', snap => {
             const list = document.getElementById('note-list'); list.innerHTML = '';
-            const data = snap.val(); let last = "No notes";
+            const data = snap.val(); let last = "No recent notes";
             for(let id in data) {
                 last = data[id].text;
                 const div = document.createElement('div'); div.className = 'list-item';
-                div.innerHTML = `<span>${data[id].text}</span><button class="delete-btn" onclick="firebase.database().ref('notes/${id}').remove()">✕</button>`;
+                div.innerHTML = `<span>${data[id].text}</span><button class="delete-btn" onclick="db.ref('notes/${id}').remove()">✕</button>`;
                 list.prepend(div);
             }
             document.getElementById('home-note-preview').innerText = last;
         });
 
-        // SYSTEM STATES
-        function updateSystemState() {
-            const hour = new Date().getHours();
-            const overlay = document.getElementById('brightness-overlay');
-            if (hour >= 7 && hour < 19) document.body.classList.add('light-mode');
-            else document.body.classList.remove('light-mode');
-            if (hour >= 0 && hour < 6) overlay.style.opacity = "1";
-            else if (hour >= 20 || hour < 7) overlay.style.opacity = "0.5";
-            else overlay.style.opacity = "0";
+        // --- FUN ---
+        async function fetchFun() {
+            try {
+                const j = await (await fetch('https://v2.jokeapi.dev/joke/Any?safe-mode&type=single')).json();
+                document.getElementById('daily-joke').innerText = j.joke || "Joke loading...";
+                const q = await (await fetch('https://dummyjson.com/quotes/random')).json();
+                document.getElementById('daily-quote').innerText = `"${q.quote}" - ${q.author}`;
+            } catch(e) {}
         }
 
-        // SCREENSAVER
+        // --- SYSTEM ---
+        function updateSystem() {
+            const h = new Date().getHours();
+            const ov = document.getElementById('brightness-overlay');
+            if (h >= 7 && h < 19) document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode');
+            if (h >= 0 && h < 6) ov.style.opacity = "1"; else if (h >= 21 || h < 7) ov.style.opacity = "0.6"; else ov.style.opacity = "0";
+        }
+
         let idle = 0;
-        const ssPhotos = ["https://images.unsplash.com/photo-1506744038136-46273834b3fb", "https://images.unsplash.com/photo-1469474968028-56623f02e42e"];
         function resetTimer() { idle = 0; document.getElementById('screensaver').style.display = 'none'; }
         setInterval(() => {
             idle++;
-            if(idle >= 30) { 
+            if(idle >= 30) {
                 const ss = document.getElementById('screensaver');
                 ss.style.display = 'flex';
-                ss.style.backgroundImage = `url('${ssPhotos[Math.floor(Math.random()*ssPhotos.length)]}?w=1200')`;
+                ss.style.backgroundImage = `url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200')`;
             }
         }, 10000);
 
-        // UI HELPERS
         window.switchTab = (id, el) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -239,29 +291,15 @@
             if(id === 'calendar') buildWeeklyCalendar();
         };
 
-        // SHARED HELPERS (Tasks, Meals, Groceries same as v10)
-        window.addTask = () => { const t = prompt("Task:"); if(t) db.ref('tasks').push({ text: t, done: false }); };
-        db.ref('tasks').on('value', snap => {
-            const list = document.getElementById('task-list'); list.innerHTML = '';
-            const data = snap.val();
-            for(let id in data) {
-                const div = document.createElement('div'); div.className = 'list-item';
-                div.innerHTML = `<span style="text-decoration:${data[id].done?'line-through':''}" onclick="firebase.database().ref('tasks/${id}').update({done:${!data[id].done}})">${data[id].text}</span><button class="delete-btn" onclick="firebase.database().ref('tasks/${id}').remove()">✕</button>`;
-                list.appendChild(div);
-            }
-        });
-
-        // INIT
         setInterval(() => {
             const n = new Date();
             document.getElementById('clock').innerText = n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
             document.getElementById('ss-clock').innerText = n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
             document.getElementById('date-string').innerText = n.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-            updateSystemState();
+            updateSystem();
         }, 1000);
 
-        fetchWeather();
-        fetchDailyFun();
+        fetchWeather(); fetchFun();
     </script>
 </body>
 </html>
