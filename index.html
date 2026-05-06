@@ -3,172 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Family Hub Pro</title>
-    <link rel="manifest" href="manifest.json">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Family Hub - v2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #000; --card: #121212; --text: #fff; --accent: #3498db; --dim: #888; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
-        
-        /* Navigation & Layout */
-        .app-container { display: flex; flex-direction: column; height: 100vh; }
-        .app-view { flex-grow: 1; padding: 20px; overflow-y: auto; display: none; padding-bottom: 100px; }
-        .active-view { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        :root {
+            --bg: #000000; --card: #111111; --text: #ffffff; --dim: #888;
+            /* Family Colors */
+            --mom: #e74c3c; --dad: #3498db; --kid1: #2ecc71; --kid2: #f1c40f;
+        }
 
-        /* Dashboard Widgets */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
-        .widget { background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid #222; }
-        .widget h3 { margin: 0 0 15px 0; font-size: 1rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+        body {
+            margin: 0; background: var(--bg); color: var(--text);
+            font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden;
+            display: flex;
+        }
 
-        /* Screensaver */
-        #screensaver { position: fixed; inset: 0; background: #000; z-index: 2000; display: none; background-size: cover; background-position: center; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        #screensaver.show { display: flex; animation: fadeIn 1s; }
-        .ss-time { font-size: 10rem; font-weight: 700; margin: 0; }
-        .ss-info { font-size: 2rem; color: #ccc; }
+        /* LEFT PANEL: Info & Widgets (30%) */
+        .left-panel {
+            width: 30%; padding: 40px; border-right: 1px solid #222;
+            display: flex; flex-direction: column; gap: 30px;
+        }
 
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(15,15,15,0.95); display: flex; justify-content: space-around; align-items: center; backdrop-filter: blur(10px); border-top: 1px solid #222; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--dim); font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
-        .nav-item.active { color: var(--accent); transform: translateY(-5px); }
-        .nav-icon { font-size: 1.8rem; margin-bottom: 4px; }
+        .time-widget h1 { font-size: 5rem; margin: 0; font-weight: 700; }
+        .time-widget p { font-size: 1.5rem; color: var(--dim); margin: 5px 0; }
+
+        .weather-box { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #222; }
+        .weather-temp { font-size: 2.5rem; font-weight: 700; }
+
+        .widget-box { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #222; }
+        .widget-box h3 { margin: 0 0 15px 0; font-size: 0.9rem; text-transform: uppercase; color: var(--dim); letter-spacing: 1px; }
+
+        .chore-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 1.1rem; cursor: pointer; }
+        .chore-check { width: 22px; height: 22px; border: 2px solid #444; border-radius: 6px; }
+        .chore-item.done .chore-check { background: var(--dad); border-color: var(--dad); position: relative; }
+        .chore-item.done .chore-check::after { content: '✓'; color: white; position: absolute; left: 4px; top: -2px; }
+        .chore-item.done span { text-decoration: line-through; color: var(--dim); }
+
+        /* RIGHT PANEL: 7-Day Vertical Calendar (70%) */
+        .right-panel { width: 70%; padding: 40px; display: flex; flex-direction: column; }
+
+        .family-legend { display: flex; gap: 20px; margin-bottom: 30px; }
+        .member { display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 1.1rem; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; }
+
+        .calendar-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            gap: 10px; flex-grow: 1;
+        }
+
+        .day-col { background: #080808; border-radius: 15px; display: flex; flex-direction: column; border: 1px solid #111; }
+        .day-header { padding: 15px; text-align: center; border-bottom: 1px solid #222; }
+        .day-header.today { background: #1a1a1a; border-radius: 15px 15px 0 0; }
+        .day-name { font-size: 0.9rem; color: var(--dim); text-transform: uppercase; }
+        .day-num { font-size: 1.8rem; font-weight: 700; }
+
+        .event-container { padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+        .event { 
+            padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; 
+            font-weight: 600; line-height: 1.3; color: #000;
+        }
+
+        /* Quotes at bottom */
+        .quote-footer { margin-top: auto; padding-top: 20px; font-style: italic; color: var(--dim); text-align: center; }
+
+        /* Interaction */
+        .editable:hover { background: #222; cursor: pointer; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-    <!-- Screensaver Layer -->
-    <div id="screensaver" onclick="wakeUp()">
-        <h1 class="ss-time" id="ss-clock">00:00</h1>
-        <div class="ss-info" id="ss-date">Monday, May 4</div>
-        <div id="ss-notify" style="margin-top:20px; font-size: 1.5rem;">✨ No upcoming alerts</div>
-    </div>
+    <aside class="left-panel">
+        <div class="time-widget">
+            <h1 id="clock">00:00</h1>
+            <p id="date">Monday, May 4</p>
+        </div>
 
-    <div class="app-container">
-        <!-- 1. HOME DASHBOARD -->
-        <div id="view-home" class="app-view active-view">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h1 id="main-clock" style="font-size:3rem; margin:0;">00:00</h1>
-                <div id="weather-widget" style="text-align:right">
-                    <div style="font-size:1.5rem">72°F</div>
-                    <div style="color:var(--dim)">Sunny, London</div>
-                </div>
-            </div>
-            <div class="dashboard-grid">
-                <div class="widget"><h3>Next Event</h3><p id="dash-cal">Syncing Google...</p></div>
-                <div class="widget"><h3>Top Chores</h3><p>• Empty Dishwasher<br>• Walk Dog</p></div>
-                <div class="widget"><h3>Tonight's Dinner</h3><p>Taco Tuesday 🌮</p></div>
+        <div class="weather-box">
+            <div class="weather-temp" id="temp">--°F</div>
+            <div id="weather-desc" style="color:var(--dim)">Fetching weather...</div>
+        </div>
+
+        <div class="widget-box">
+            <h3>Chores</h3>
+            <div id="chore-list">
+                <div class="chore-item" onclick="toggleChore(this)"><div class="chore-check"></div><span>Dishwasher</span></div>
+                <div class="chore-item" onclick="toggleChore(this)"><div class="chore-check"></div><span>Dog Walk</span></div>
             </div>
         </div>
 
-        <!-- 2. CALENDAR VIEW -->
-        <div id="view-calendar" class="app-view">
-            <h2>Shared Calendar</h2>
-            <div id="calendar-sync-status">Connected to Google Calendar</div>
-            <!-- Google Calendar iFrame can go here -->
+        <div class="widget-box">
+            <h3>Tonight's Dinner</h3>
+            <div class="editable" id="dinner-text" onclick="editDinner()" style="font-size: 1.4rem; font-weight: 600;">Tap to set dinner...</div>
         </div>
 
-        <!-- 3. TASKS VIEW -->
-        <div id="view-tasks" class="app-view">
-            <h2>Chore List & Rewards</h2>
-            <div class="widget">Add chores via mobile app to see them here.</div>
+        <div class="quote-footer" id="quote">"Home is where the heart is."</div>
+    </aside>
+
+    <main class="right-panel">
+        <div class="family-legend">
+            <div class="member"><div class="dot" style="background:var(--mom)"></div>Mom</div>
+            <div class="member"><div class="dot" style="background:var(--dad)"></div>Dad</div>
+            <div class="member"><div class="dot" style="background:var(--kid1)"></div>Alex</div>
+            <div class="member"><div class="dot" style="background:var(--kid2)"></div>Maya</div>
         </div>
 
-        <!-- 4. MEALS VIEW -->
-        <div id="view-meals" class="app-view">
-            <h2>Meal Planner & Pantry</h2>
-            <div class="widget">Grocery List: Milk, Eggs, Bread</div>
+        <div class="calendar-grid" id="calendar-grid">
+            <!-- 7 Days will be generated here -->
         </div>
-
-        <!-- 5. NOTES VIEW -->
-        <div id="view-notes" class="app-view">
-            <h2>Family Notes</h2>
-            <textarea style="width:100%; height:200px; background:#222; color:#fff; border-radius:10px; padding:10px; border:none;"></textarea>
-        </div>
-
-        <!-- NAVIGATION -->
-        <nav class="bottom-nav">
-            <div class="nav-item active" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span>Home</div>
-            <div class="nav-item" onclick="switchTab('calendar', this)"><span class="nav-icon">📅</span>Calendar</div>
-            <div class="nav-item" onclick="switchTab('tasks', this)"><span class="nav-icon">✅</span>Tasks</div>
-            <div class="nav-item" onclick="switchTab('meals', this)"><span class="nav-icon">🍲</span>Meals</div>
-            <div class="nav-item" onclick="switchTab('notes', this)"><span class="nav-icon">📝</span>Notes</div>
-        </nav>
-    </div>
+    </main>
 
     <script>
-        // --- 1. NAVIGATION LOGIC ---
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active-view'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('view-' + tabId).classList.add('active-view');
-            el.classList.add('active');
-            resetIdle();
-        }
-
-        // --- 2. CLOCK & WEATHER ---
-        function updateTime() {
-            const now = new Date();
-            const time = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            document.getElementById('main-clock').innerText = time;
-            document.getElementById('ss-clock').innerText = time;
-            document.getElementById('ss-date').innerText = now.toLocaleDateString([], {weekday: 'long', month: 'long', day: 'numeric'});
+        // 1. DYNAMIC CALENDAR GENERATION
+        function buildCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const today = new Date();
             
-            // 7:30 AM Alert Logic
-            if(now.getHours() === 7 && now.getMinutes() === 30 && now.getSeconds() === 0) {
-                alert("Good Morning! Check your tasks for today.");
+            for (let i = 0; i < 7; i++) {
+                const date = new Date();
+                date.setDate(today.getDate() + i);
+                
+                const isToday = i === 0 ? 'today' : '';
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                const dayNum = date.getDate();
+
+                const dayHtml = `
+                    <div class="day-col">
+                        <div class="day-header ${isToday}">
+                            <div class="day-name">${dayName}</div>
+                            <div class="day-num">${dayNum}</div>
+                        </div>
+                        <div class="event-container">
+                            ${i === 0 ? '<div class="event" style="background:var(--mom)">Gym @ 8am</div>' : ''}
+                            ${i === 1 ? '<div class="event" style="background:var(--kid1)">Soccer Practice</div>' : ''}
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += dayHtml;
             }
         }
-        setInterval(updateTime, 1000);
+        buildCalendar();
 
-        // --- 3. SCREENSAVER & PHOTOS ---
-        let idleSeconds = 0;
-        const IDLE_LIMIT = 60; // 1 minute
-        const photos = [
-            'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
-            'https://images.unsplash.com/photo-1470770841072-f978cf4d019e'
-        ];
+        // 2. WEATHER LOGIC (Enter your address/city)
+        const WEATHER_API_KEY = 'YOUR_API_KEY'; 
+        const CITY = 'London'; // Replace with your home address/city
 
-        function resetIdle() { 
-            idleSeconds = 0; 
-            document.getElementById('screensaver').classList.remove('show');
+        async function fetchWeather() {
+            try {
+                // If you have a key, uncomment below:
+                // const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${CITY}&units=imperial&appid=${WEATHER_API_KEY}`);
+                // const data = await res.json();
+                // document.getElementById('temp').innerText = Math.round(data.main.temp) + '°F';
+                // document.getElementById('weather-desc').innerText = data.weather[0].description;
+                
+                // Mocking for now:
+                document.getElementById('temp').innerText = '68°F';
+                document.getElementById('weather-desc').innerText = 'Mostly Sunny';
+            } catch (e) { console.log("Weather error"); }
+        }
+        fetchWeather();
+        setInterval(fetchWeather, 1800000); // Update every 30 mins
+
+        // 3. INTERACTIVE CHORES & DINNER
+        function toggleChore(el) {
+            el.classList.toggle('done');
         }
 
-        function wakeUp() { resetIdle(); }
+        function editDinner() {
+            const newDinner = prompt("What's for dinner tonight?", document.getElementById('dinner-text').innerText);
+            if (newDinner) document.getElementById('dinner-text').innerText = newDinner;
+        }
 
-        setInterval(() => {
-            idleSeconds++;
-            if(idleSeconds >= IDLE_LIMIT) {
-                const ss = document.getElementById('screensaver');
-                ss.style.backgroundImage = `url(${photos[Math.floor(Math.random()*photos.length)]})`;
-                ss.classList.add('show');
-            }
-        }, 1000);
-
-        // Listen for activity
-        ['mousedown', 'touchstart', 'keypress'].forEach(e => window.addEventListener(e, resetIdle));
-
-        // --- 4. WHERE TO ADD APIS ---
-        
-        /* 
-           WEATHER: 
-           Sign up at OpenWeatherMap.org. Replace the weather-widget content with a 
-           fetch() call inside a function that runs every 30 mins.
-        */
-
-        /* 
-           CALENDAR: 
-           To sync with your phone, go to Google Calendar > Settings > Integrate.
-           Copy the "Public URL" or "Secret iFrame" and paste it into the Calendar View div.
-        */
-
-        /* 
-           SYNCING (MOBILE TO DISPLAY):
-           This is where you add Firebase. 
-           1. Go to console.firebase.google.com
-           2. Add a 'Web App'
-           3. Paste the 'firebaseConfig' object here.
-           4. Use 'onValue' to listen for changes to your chore list.
-        */
+        // 4. CLOCK
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
     </script>
 </body>
 </html>
