@@ -17,7 +17,6 @@
         }
 
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-        
         .tab-content { flex-grow: 1; display: none; height: 100%; overflow-y: auto; padding-bottom: 120px; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -25,7 +24,7 @@
         /* --- HOME SCREEN --- */
         .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; box-sizing: border-box; }
         .header-tile { grid-column: 1 / span 2; display: flex; justify-content: space-between; align-items: center; }
-        .clock-tile h1 { font-size: 5.5rem; margin: 0; font-weight: 700; letter-spacing: -3px; transition: 0.3s; }
+        .clock-tile h1 { font-size: 5.5rem; margin: 0; font-weight: 700; letter-spacing: -3px; }
         .tile { background: var(--card); border-radius: 24px; padding: 20px; border: 1px solid #222; }
         .tile h3 { margin: 0 0 12px 0; color: var(--dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 
@@ -35,112 +34,76 @@
         .person-day h4 { margin: 0 0 8px 0; font-size: 0.9rem; }
         .event-mini { font-size: 0.7rem; color: #fff; background: rgba(255,255,255,0.1); padding: 3px 6px; border-radius: 4px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* --- 7-DAY CALENDAR TAB --- */
+        /* --- 7-DAY CALENDAR GRID --- */
         .legend-container { display: flex; justify-content: center; gap: 20px; padding: 20px; flex-wrap: wrap; }
         .legend-item { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.9rem; }
         .legend-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--c); }
-        
         .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; padding: 0 20px; }
         .day-col { background: #111; border-radius: 12px; border: 1px solid #222; min-height: 500px; display: flex; flex-direction: column; }
         .day-header { text-align: center; padding: 12px 5px; background: #1a1a1a; border-radius: 12px 12px 0 0; border-bottom: 2px solid #222; }
         .day-header .day-name { font-size: 0.8rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
-        .day-header .day-num { font-size: 1.5rem; font-weight: bold; margin-top: 2px; }
-        .day-events { padding: 10px; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
-        
-        .cal-event { background: rgba(255,255,255,0.05); border-left: 4px solid var(--c); padding: 10px; border-radius: 6px; font-size: 0.85rem; }
-        .cal-event-time { font-size: 0.7rem; color: var(--dim); margin-bottom: 4px; font-weight: bold; }
+        .day-header .day-num { font-size: 1.5rem; font-weight: bold; }
+        .day-events { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .cal-event { background: rgba(255,255,255,0.05); border-left: 4px solid var(--c); padding: 8px; border-radius: 6px; font-size: 0.85rem; }
+        .cal-event-time { font-size: 0.7rem; color: var(--dim); margin-bottom: 2px; }
 
-        /* --- GENERAL UI --- */
-        .add-btn-round { background: var(--grad); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 1.5rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .edit-btn { background: #333; color: #fff; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 0.9rem; }
-        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: #1a1a1a; margin-bottom: 8px; border-radius: 16px; border: 1px solid #222;}
-        
-        /* --- SCREENSAVER (PHOTO SLIDESHOW) --- */
-        #screensaver { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: none; 
-            justify-content: center; align-items: center; 
-            background-color: black; background-size: cover; background-position: center;
-            transition: background-image 2s ease-in-out; /* Smooth fade between photos */
-        }
-        /* Dark overlay so the clock remains readable over bright photos */
+        /* --- SCREENSAVER --- */
+        #screensaver { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: none; justify-content: center; align-items: center; background-size: cover; background-position: center; transition: 2s; }
         #screensaver::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); }
-        #ss-clock { font-size: 10rem; font-weight: 300; position: relative; z-index: 10000; color: white; text-shadow: 0px 5px 20px rgba(0,0,0,0.8); margin: 0; }
+        #ss-clock { font-size: 10rem; font-weight: 300; position: relative; z-index: 10000; color: white; margin: 0; }
 
         /* --- BOTTOM NAV --- */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: #050505; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 100; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: #050505; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; }
         .nav-item { color: var(--dim); text-align: center; cursor: pointer; flex: 1; display: flex; flex-direction: column; align-items: center; }
         .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 1.6rem; margin-bottom: 4px; }
-        .nav-text { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .nav-icon { font-size: 1.6rem; }
+        .nav-text { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; }
 
-        /* --- MOBILE SCALING (RESPONSIVE) --- */
         @media (max-width: 768px) {
-            .home-grid { grid-template-columns: 1fr; gap: 10px; }
-            .header-tile { grid-column: 1; flex-direction: column; align-items: flex-start; }
-            .clock-tile h1 { font-size: 4rem; }
-            .tile { grid-column: 1 !important; }
-            .home-calendar-strip { grid-column: 1; grid-template-columns: 1fr 1fr; }
-            
-            /* Stacks the 7 days on mobile so they don't squash */
+            .home-grid { grid-template-columns: 1fr; }
             .week-grid { grid-template-columns: 1fr; }
             .day-col { min-height: auto; }
-            .day-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; }
-            .day-header .day-num { font-size: 1.1rem; }
-            
-            .bottom-nav { height: 70px; }
-            .nav-icon { font-size: 1.3rem; }
             #ss-clock { font-size: 6rem; }
         }
     </style>
 </head>
 <body onmousemove="resetTimer()" onclick="resetTimer()" ontouchstart="resetTimer()">
 
-    <!-- SCREENSAVER WITH CLOCK -->
     <div id="screensaver" onclick="hideScreensaver()"><h1 id="ss-clock">00:00</h1></div>
 
-    <!-- 1. HOME TAB -->
     <div id="home" class="tab-content active">
         <div class="home-grid">
             <div class="header-tile">
                 <div class="clock-tile"><h1 id="clock">00:00</h1><p id="date-string">...</p></div>
-                <div style="text-align: right;"><div id="temp" style="font-size: 2rem; font-weight: 700;">18°C</div><div style="color:var(--dim)">Evesham, UK</div></div>
+                <div style="text-align: right;"><div id="temp">18°C</div><div style="color:var(--dim)">Evesham</div></div>
             </div>
-            <div class="tile"><h3>🍲 Dinner</h3><div id="home-dinner" style="font-size: 1.5rem; font-weight: 600; color: #fff;">Loading...</div></div>
-            <div class="tile"><h3>✅ Tasks</h3><div id="home-tasks-preview" style="font-size: 1.1rem; font-weight: 500;">No tasks</div></div>
-            <div class="tile" style="grid-column: 1 / span 2;"><h3>📝 Latest Note</h3><div id="home-note-preview" style="font-size: 1rem; color: #ccc;">No notes yet.</div></div>
-            <div class="tile" style="grid-column: 1 / span 2; text-align: center; padding: 15px;"><span id="quote-display" style="font-style: italic; color: #aaa; font-size: 1.1rem;">"Family is everything."</span></div>
+            <div class="tile"><h3>🍲 Dinner</h3><div id="home-dinner">Loading...</div></div>
+            <div class="tile"><h3>✅ Tasks</h3><div id="home-tasks-preview">No tasks</div></div>
+            <div class="tile" style="grid-column: 1 / span 2;"><h3>📝 Latest Note</h3><div id="home-note-preview">No notes.</div></div>
             <div class="home-calendar-strip">
-                <div class="person-day" style="--c:var(--Michelle)"><h4>Michelle</h4><div id="day-Michelle" style="color:var(--dim); font-size:0.75rem;">Syncing...</div></div>
-                <div class="person-day" style="--c:var(--Paul)"><h4>Paul</h4><div id="day-Paul" style="color:var(--dim); font-size:0.75rem;">Syncing...</div></div>
-                <div class="person-day" style="--c:var(--Ella)"><h4>Ella</h4><div id="day-Ella" style="color:var(--dim); font-size:0.75rem;">Syncing...</div></div>
-                <div class="person-day" style="--c:var(--Ivy)"><h4>Ivy</h4><div id="day-Ivy" style="color:var(--dim); font-size:0.75rem;">Syncing...</div></div>
+                <div class="person-day" style="--c:var(--Michelle)"><h4>Michelle</h4><div id="day-Michelle">Syncing...</div></div>
+                <div class="person-day" style="--c:var(--Paul)"><h4>Paul</h4><div id="day-Paul">Syncing...</div></div>
+                <div class="person-day" style="--c:var(--Ella)"><h4>Ella</h4><div id="day-Ella">Syncing...</div></div>
+                <div class="person-day" style="--c:var(--Ivy)"><h4>Ivy</h4><div id="day-Ivy">Syncing...</div></div>
             </div>
         </div>
     </div>
 
-    <!-- 2. CALENDAR TAB (7-Day View) -->
     <div id="calendar" class="tab-content">
-        <!-- Color Legend -->
         <div class="legend-container">
-            <div class="legend-item"><div class="legend-dot" style="--c: var(--Michelle)"></div>Michelle</div>
-            <div class="legend-item"><div class="legend-dot" style="--c: var(--Paul)"></div>Paul</div>
-            <div class="legend-item"><div class="legend-dot" style="--c: var(--Ella)"></div>Ella</div>
-            <div class="legend-item"><div class="legend-dot" style="--c: var(--Ivy)"></div>Ivy</div>
+            <div class="legend-item"><div class="legend-dot" style="--c:var(--Michelle)"></div>Michelle</div>
+            <div class="legend-item"><div class="legend-dot" style="--c:var(--Paul)"></div>Paul</div>
+            <div class="legend-item"><div class="legend-dot" style="--c:var(--Ella)"></div>Ella</div>
+            <div class="legend-item"><div class="legend-dot" style="--c:var(--Ivy)"></div>Ivy</div>
         </div>
-        
-        <!-- Grid injected by JS -->
-        <div id="week-grid-container">
-            <p style="text-align:center; color:var(--dim); margin-top:50px;">Syncing family events...</p>
-        </div>
+        <div id="week-grid-container"></div>
     </div>
 
-    <!-- REST OF TABS -->
-    <div id="meals" class="tab-content"><div style="padding:20px;"><h2>Weekly Meal Plan</h2><div id="meal-list"></div></div></div>
-    <div id="tasks" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between; align-items:center;"><h2>Tasks</h2><button class="add-btn-round" onclick="addTask()">+</button></div><div id="task-list" style="padding:0 20px;"></div></div>
-    <div id="groceries" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between; align-items:center;"><h2>Groceries</h2><button class="add-btn-round" onclick="addGrocery()">+</button></div><div id="grocery-list" style="padding:0 20px;"></div></div>
-    <div id="notes" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between; align-items:center;"><h2>Notes</h2><button class="add-btn-round" onclick="addNote()">+</button></div><div id="note-list" style="padding:0 20px;"></div></div>
+    <div id="meals" class="tab-content"><div style="padding:20px;"><h2>Meals</h2><div id="meal-list"></div></div></div>
+    <div id="tasks" class="tab-content"><div style="padding:20px;"><h2>Tasks</h2><div id="task-list"></div></div></div>
+    <div id="groceries" class="tab-content"><div style="padding:20px;"><h2>Groceries</h2><div id="grocery-list"></div></div></div>
+    <div id="notes" class="tab-content"><div style="padding:20px;"><h2>Notes</h2><div id="note-list"></div></div></div>
 
-    <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></div>
         <div class="nav-item" onclick="switchTab('calendar', this)"><span class="nav-icon">📅</span><span class="nav-text">Calendar</span></div>
@@ -151,10 +114,10 @@
     </nav>
 
     <script>
-        // --- CONFIG ---
+        // --- DATA PLUGGED IN ---
         const GOOGLE_API_KEY = 'AIzaSyCBb3Uu--Sr21o65TUddUBIPfLfQwZsV_o';
         const FAMILY_CALENDARS = {
-            Michelle: 'f530723b3c2df77470e054a97e85e787334b82173a70dd3e1bf22ac993b50865@group.calendar.google.com',
+            Michelle: 'malvcomp@gmail.com',
             Paul: '9f686e18312a637015a36791d26311728da7240728adf8dda932c5cabc13456e@group.calendar.google.com',
             Ella: '361ba78ae3e35bf7a888ebef5f4cbf436be8049abdfa4680f566e36c1a872e7a@group.calendar.google.com',
             Ivy: '4993c431444a8a1fe2cc3ff0e4615c2b1b3cc8b53b65b8b5b5c5b4bd06c0aeb7@group.calendar.google.com'
@@ -175,207 +138,85 @@
         // --- CALENDAR LOGIC ---
         async function fetchEvents(name, limit = 15) {
             const email = FAMILY_CALENDARS[name];
-            if(email.includes('PASTE_')) return null; 
-            
             const timeMin = new Date().toISOString();
             const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(email)}/events?key=${GOOGLE_API_KEY}&timeMin=${timeMin}&singleEvents=true&orderBy=startTime&maxResults=${limit}`;
-            
             try {
                 const res = await fetch(url);
                 const data = await res.json();
-                if (data.error) return null;
                 return data.items || [];
             } catch (e) { return null; }
         }
 
-        // Builds the unified 7-day grid
         async function buildWeeklyCalendar() {
             const container = document.getElementById('week-grid-container');
-            
-            // 1. Fetch everyone's events and combine them
+            container.innerHTML = '<p style="text-align:center; color:var(--dim);">Syncing events...</p>';
             let allEvents = [];
             for (const name in FAMILY_CALENDARS) {
-                const events = await fetchEvents(name, 20); 
-                if (events) {
-                    events.forEach(e => {
-                        let dateObj = new Date(e.start.dateTime || e.start.date);
-                        allEvents.push({
-                            ...e,
-                            personName: name,
-                            timeObj: dateObj,
-                            dayKey: dateObj.toDateString() // Used to group events by exact day
-                        });
-                    });
-                }
+                const events = await fetchEvents(name, 15);
+                if (events) events.forEach(e => {
+                    let d = new Date(e.start.dateTime || e.start.date);
+                    allEvents.push({ ...e, person: name, timeObj: d, key: d.toDateString() });
+                });
             }
-
-            // 2. Sort all combined events by time
-            allEvents.sort((a, b) => a.timeObj - b.timeObj);
-
-            // 3. Generate the next 7 days
-            const days = [];
-            for (let i = 0; i < 7; i++) {
-                const d = new Date();
-                d.setDate(d.getDate() + i);
-                days.push(d);
-            }
-
-            // 4. Build the HTML Grid
-            let gridHTML = '<div class="week-grid">';
+            allEvents.sort((a,b) => a.timeObj - b.timeObj);
+            const days = []; for(let i=0; i<7; i++) { let d = new Date(); d.setDate(d.getDate()+i); days.push(d); }
+            let html = '<div class="week-grid">';
             days.forEach(day => {
-                const dayName = day.toLocaleDateString('en-US', { weekday: 'short' });
-                const dayNum = day.getDate();
-                const key = day.toDateString();
-                
-                gridHTML += `<div class="day-col">
-                    <div class="day-header">
-                        <div class="day-name">${dayName}</div>
-                        <div class="day-num">${dayNum}</div>
-                    </div>
-                    <div class="day-events">`;
-
-                // Find events that match this specific day
-                const dayEvents = allEvents.filter(e => e.dayKey === key);
-                
-                if (dayEvents.length === 0) {
-                     gridHTML += `<div style="text-align:center; padding-top:20px; color:var(--dim); font-size:0.8rem;">Free</div>`;
-                } else {
-                     dayEvents.forEach(e => {
-                         const timeStr = e.start.dateTime ? e.timeObj.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'All Day';
-                         gridHTML += `<div class="cal-event" style="--c: var(--${e.personName})">
-                             <div class="cal-event-time">${timeStr}</div>
-                             <div style="font-weight: 500;">${e.summary}</div>
-                         </div>`;
-                     });
-                }
-                
-                gridHTML += `</div></div>`;
+                html += `<div class="day-col"><div class="day-header"><div class="day-name">${day.toLocaleDateString('en-GB',{weekday:'short'})}</div><div class="day-num">${day.getDate()}</div></div><div class="day-events">`;
+                const dayEvs = allEvents.filter(e => e.key === day.toDateString());
+                if (dayEvs.length === 0) html += '<div style="text-align:center; color:#333; padding-top:20px;">Free</div>';
+                else dayEvs.forEach(e => {
+                    const time = e.start.dateTime ? e.timeObj.toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'}) : 'All Day';
+                    html += `<div class="cal-event" style="--c:var(--${e.person})"><div class="cal-event-time">${time}</div><b>${e.summary}</b></div>`;
+                });
+                html += '</div></div>';
             });
-            gridHTML += '</div>';
-            
-            container.innerHTML = gridHTML;
+            container.innerHTML = html + '</div>';
         }
 
         async function syncHomeStrip() {
             for (const name in FAMILY_CALENDARS) {
                 const events = await fetchEvents(name, 2);
-                const container = document.getElementById(`day-${name}`);
+                const cont = document.getElementById(`day-${name}`);
                 if (events && events.length > 0) {
-                    container.innerHTML = '';
+                    cont.innerHTML = '';
                     events.forEach(e => {
-                        const div = document.createElement('div');
-                        div.className = 'event-mini';
-                        div.innerText = e.summary;
-                        container.appendChild(div);
+                        const div = document.createElement('div'); div.className = 'event-mini'; div.innerText = e.summary; cont.appendChild(div);
                     });
-                } else {
-                    container.innerText = 'Free';
-                }
+                } else { cont.innerText = 'Free'; }
             }
         }
 
-        // --- SCREENSAVER LOGIC ---
-        // Add your own photo URLs here!
-        const ssPhotos = [
-            "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=1080&q=80",
-            "https://images.unsplash.com/photo-1542037104857-ffbb0b9155fb?w=1080&q=80",
-            "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1080&q=80",
-            "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1080&q=80"
-        ];
-        let photoIdx = 0;
-        let idleTime = 0;
-        const screensaverEl = document.getElementById('screensaver');
-
-        function resetTimer() { 
-            idleTime = 0; 
-            if(screensaverEl.style.display === 'flex') {
-                screensaverEl.style.display = 'none'; 
-            }
-        }
-
-        // Timer for idle check (shows screensaver after 120 seconds)
-        setInterval(() => { 
-            idleTime++; 
-            if (idleTime >= 120 && screensaverEl.style.display !== 'flex') {
-                screensaverEl.style.display = 'flex';
-                screensaverEl.style.backgroundImage = `url('${ssPhotos[photoIdx]}')`; // Load first photo immediately
-            } 
-        }, 1000);
-
-        // Timer to rotate photos every 10 seconds while screensaver is active
-        setInterval(() => {
-            if (screensaverEl.style.display === 'flex') {
-                photoIdx = (photoIdx + 1) % ssPhotos.length;
-                screensaverEl.style.backgroundImage = `url('${ssPhotos[photoIdx]}')`;
-            }
-        }, 10000);
-
-        function hideScreensaver() { screensaverEl.style.display = 'none'; }
-
-        // --- OTHER TABS LOGIC ---
-        const quotes = ["Home is where our story begins.", "Focus on the good.", "Happiness is homemade.", "Choose kindness today."];
-        document.getElementById('quote-display').innerText = `"${quotes[Math.floor(Math.random()*quotes.length)]}"`;
-
-        const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        window.editMeal = (day, currentMeal) => { const m = prompt(`What's for dinner on ${day}?`, currentMeal); if (m !== null) db.ref('meals/' + day).set(m); };
-        db.ref('meals').on('value', snap => {
-            const meals = snap.val() || {}; const list = document.getElementById('meal-list'); list.innerHTML = '';
-            weekdays.forEach(day => {
-                const row = document.createElement('div'); row.className = 'list-item';
-                row.innerHTML = `<div style="display:flex; align-items:center; gap:15px; width:100%;"><span style="font-weight:bold; color:var(--accent); width:100px;">${day}</span><span style="flex-grow:1; color:${meals[day] ? '#fff' : '#666'};">${meals[day] || "Tap edit..."}</span><button class="edit-btn" onclick="editMeal('${day}', '${meals[day] || ''}')">✎ Edit</button></div>`;
-                list.appendChild(row);
-            });
-            const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-            document.getElementById('home-dinner').innerText = meals[todayName] || "No meal set";
-        });
-
-        window.addGrocery = () => { const item = prompt("Add to shopping list:"); if (item) db.ref('groceries').push({ text: item, done: false }); };
-        db.ref('groceries').on('value', snap => {
-            const list = document.getElementById('grocery-list'); list.innerHTML = ''; const data = snap.val();
-            for (let id in data) {
-                const row = document.createElement('div'); row.className = 'list-item'; row.style.opacity = data[id].done ? '0.3' : '1';
-                row.innerHTML = `<div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="firebase.database().ref('groceries/${id}').update({done: ${!data[id].done}})"><span style="font-size:1.3rem;">${data[id].done ? '✅' : '🛒'}</span><span style="text-decoration: ${data[id].done ? 'line-through' : 'none'};">${data[id].text}</span></div><button class="edit-btn" style="background:#e74c3c; padding:6px 10px;" onclick="firebase.database().ref('groceries/${id}').remove()">X</button>`;
-                list.appendChild(row);
-            }
-        });
-
-        window.addTask = () => { const t = prompt("New Task:"); if(t) db.ref('tasks').push({ text: t, done: false }); };
-        db.ref('tasks').on('value', snap => {
-            const list = document.getElementById('task-list'); const homePrev = document.getElementById('home-tasks-preview'); list.innerHTML = '';
-            const data = snap.val(); let count = 0;
-            for(let id in data) { if(!data[id].done) count++; const row = document.createElement('div'); row.className = 'list-item'; row.style.opacity = data[id].done ? '0.3' : '1'; row.onclick = () => db.ref('tasks/'+id).update({done: !data[id].done}); row.innerHTML = `<span>${data[id].done ? '✅' : '⭕️'} ${data[id].text}</span>`; list.appendChild(row); }
-            homePrev.innerText = count > 0 ? `${count} remaining` : "Done!";
-        });
-
-        window.addNote = () => { const text = prompt("Note:"); if (text) db.ref('notes').push({ text, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) }); };
-        db.ref('notes').on('value', snap => {
-            const list = document.getElementById('note-list'); const preview = document.getElementById('home-note-preview'); list.innerHTML = '';
-            const data = snap.val(); let lastNote = "";
-            for (let id in data) { lastNote = data[id].text; const card = document.createElement('div'); card.className = 'note-card'; card.innerHTML = `<div>${data[id].text}</div><div style="font-size:0.75rem; color:var(--dim); margin-top:8px;">${data[id].time}</div>`; list.prepend(card); }
-            preview.innerText = lastNote || "No notes.";
-        });
-
+        // --- UI LOGIC ---
         window.switchTab = (id, el) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
-            
+            document.getElementById(id).classList.add('active'); el.classList.add('active');
+            if(id === 'calendar') buildWeeklyCalendar();
             if(id === 'home') syncHomeStrip();
-            if(id === 'calendar') buildWeeklyCalendar(); // Automatically build grid when opening calendar
         };
 
-        // Initialize clock & dates
+        const ssPhotos = ["https://images.unsplash.com/photo-1511895426328-dc8714191300?w=1080", "https://images.unsplash.com/photo-1542037104857-ffbb0b9155fb?w=1080"];
+        let pIdx = 0, idleTime = 0;
+        function resetTimer() { idleTime = 0; document.getElementById('screensaver').style.display = 'none'; }
+        setInterval(() => {
+            idleTime++;
+            if (idleTime >= 120) {
+                const ss = document.getElementById('screensaver');
+                ss.style.display = 'flex'; ss.style.backgroundImage = `url('${ssPhotos[pIdx]}')`;
+                pIdx = (pIdx + 1) % ssPhotos.length;
+            }
+        }, 10000);
+
         setInterval(() => {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
             document.getElementById('ss-clock').innerText = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            document.getElementById('date-string').innerText = now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+            document.getElementById('date-string').innerText = now.toLocaleDateString('en-GB', {weekday:'long', month:'long', day:'numeric'});
         }, 1000);
 
-        // Run syncs on load
         syncHomeStrip();
-        buildWeeklyCalendar(); 
+        buildWeeklyCalendar();
     </script>
 </body>
 </html>
