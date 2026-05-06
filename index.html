@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
-    <title>Family Hub Pro V14</title>
+    <title>Family Hub Pro V15</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -16,61 +16,66 @@
             --Michelle: #e74c3c; --Paul: #3498db; --Ella: #2ecc71; --Ivy: #f1c40f;
             --nav-bg: #050505;
         }
+        /* LIGHT MODE RESTORED */
         body.light-mode { --bg: #f5f5f7; --card: #ffffff; --text: #1d1d1f; --dim: #86868b; --nav-bg: #ffffff; }
 
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; transition: background 0.5s, color 0.5s; font-size: 16px; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; transition: background 0.5s; }
         
         #brightness-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10001; background: black; opacity: 0; transition: opacity 2s; }
-        .tab-content { flex-grow: 1; display: none; height: 100%; overflow-y: auto; padding-bottom: 100px; }
+        .tab-content { flex-grow: 1; display: none; height: 100%; overflow-y: auto; padding-bottom: 85px; }
         .tab-content.active { display: block; }
 
-        /* HOME GRID */
-        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; }
-        .header-tile { grid-column: 1 / span 2; display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px; }
-        .clock-tile h1 { font-size: 4.5rem; margin: 0; font-weight: 700; letter-spacing: -3px; line-height: 1; }
-        .tile { background: var(--card); border-radius: 20px; padding: 15px; border: 1px solid rgba(128,128,128,0.1); }
-        .tile h3 { margin-top: 0; font-size: 0.85rem; color: var(--dim); text-transform: uppercase; }
+        /* HOME GRID - TIGHTER RATIOS */
+        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; }
+        .header-tile { grid-column: 1 / span 2; display: flex; justify-content: space-between; align-items: flex-end; }
+        .clock-tile h1 { font-size: 4.2rem; margin: 0; font-weight: 700; letter-spacing: -3px; line-height: 0.9; }
+        .tile { background: var(--card); border-radius: 18px; padding: 12px; border: 1px solid rgba(128,128,128,0.1); }
+        .tile h3 { margin: 0 0 5px 0; font-size: 0.8rem; color: var(--dim); text-transform: uppercase; }
         
-        /* HOME AGENDA */
-        .home-calendar-strip { grid-column: 1 / span 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .person-day { background: var(--card); border-radius: 15px; padding: 10px; border-top: 4px solid var(--c); min-height: 70px; }
-        .person-day h4 { margin: 0 0 5px 0; font-size: 0.85rem; }
-        .mini-event { font-size: 0.7rem; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .home-calendar-strip { grid-column: 1 / span 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .person-day { background: var(--card); border-radius: 12px; padding: 8px; border-top: 4px solid var(--c); min-height: 60px; }
+        .person-day h4 { margin: 0 0 3px 0; font-size: 0.8rem; }
+        .mini-event { font-size: 0.65rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* WEATHER */
-        .weather-main { font-size: 2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
-        .weather-forecast { display: flex; gap: 10px; margin-top: 5px; }
-        .forecast-day { text-align: center; flex: 1; font-size: 0.7rem; color: var(--dim); }
+        .weather-main { font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; gap: 5px; justify-content: flex-end; }
+        .weather-forecast { display: flex; gap: 8px; margin-top: 5px; }
+        .forecast-day { text-align: center; flex: 1; font-size: 0.65rem; color: var(--dim); }
 
-        /* NAVIGATION - COMPACT */
+        /* LISTS - COMPACTED */
+        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: var(--card); margin-bottom: 5px; border-radius: 10px; border: 1px solid rgba(128,128,128,0.1); font-size: 0.9rem; }
+        .edit-btn { background: var(--accent); color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 0.8rem; }
+
+        /* CALENDAR TAB RESTORED */
+        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; padding: 10px; height: 80%; }
+        .day-col { background: var(--card); border-radius: 8px; border: 1px solid rgba(128,128,128,0.1); min-height: 400px; }
+        .day-header { text-align: center; padding: 8px 2px; border-bottom: 1px solid rgba(128,128,128,0.1); }
+        .cal-event { background: rgba(128,128,128,0.1); border-left: 3px solid var(--c); padding: 4px; border-radius: 3px; font-size: 0.7rem; margin: 3px; }
+
+        /* NAV */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(128,128,128,0.1); z-index: 100; }
-        .nav-item { color: var(--dim); text-align: center; flex: 1; cursor: pointer; }
-        .nav-icon { font-size: 1.8rem; display: block; }
-        .nav-label { font-size: 0.65rem; font-weight: 700; }
+        .nav-item { color: var(--dim); text-align: center; flex: 1; }
+        .nav-icon { font-size: 1.7rem; display: block; }
+        .nav-label { font-size: 0.6rem; font-weight: 700; }
         .nav-item.active { color: var(--accent); }
 
-        /* SCREENSAVER EXPANDED */
-        #screensaver { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; background-size: cover; background-position: center; text-align: center; color: white; background-color: black;}
-        #ss-info { z-index: 10000; text-shadow: 0 0 30px rgba(0,0,0,0.9); background: rgba(0,0,0,0.2); padding: 40px; border-radius: 30px; }
+        /* SCREENSAVER */
+        #screensaver { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; background: black; color: white; text-align: center; }
+        #ss-info { text-shadow: 0 0 20px rgba(0,0,0,1); }
         #ss-clock { font-size: 8rem; font-weight: 700; margin: 0; }
-        #ss-date { font-size: 2rem; opacity: 0.9; margin-bottom: 20px; }
-        #ss-weather { font-size: 2.5rem; font-weight: 500; margin-bottom: 20px; }
-        #ss-agenda { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
-        .ss-person { font-size: 1rem; border-left: 3px solid var(--c); padding-left: 10px; text-align: left; }
-
-        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--card); margin-bottom: 8px; border-radius: 12px; border: 1px solid rgba(128,128,128,0.1); }
-        .edit-btn { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.85rem; }
+        #ss-agenda { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+        .ss-person { font-size: 0.9rem; border-left: 3px solid var(--c); padding-left: 10px; text-align: left; }
     </style>
 </head>
 <body onmousemove="resetTimer()" onclick="resetTimer()" ontouchstart="resetTimer()">
 
     <div id="brightness-overlay"></div>
 
-    <div id="screensaver" onclick="hideScreensaver()">
+    <div id="screensaver" onclick="resetTimer()">
         <div id="ss-info">
             <h1 id="ss-clock">00:00</h1>
-            <div id="ss-date">Wednesday, 6 May</div>
-            <div id="ss-weather">☀️ 21° Worcester</div>
+            <div id="ss-date" style="font-size: 1.5rem; opacity: 0.8;">...</div>
+            <div id="ss-weather" style="font-size: 2rem; margin: 15px 0;">...</div>
             <div id="ss-agenda"></div>
         </div>
     </div>
@@ -79,23 +84,23 @@
     <div id="home" class="tab-content active">
         <div class="home-grid">
             <div class="header-tile">
-                <div class="clock-tile"><h1 id="clock">00:00</h1><p id="date-string" style="margin:0; color:var(--dim)">...</p></div>
+                <div class="clock-tile"><h1 id="clock">00:00</h1><p id="date-string" style="margin:0; color:var(--dim); font-size: 0.9rem;">...</p></div>
                 <div id="weather-widget" style="text-align: right;">
                     <div class="weather-main"><span id="w-icon">☀️</span> <span id="temp">--°</span></div>
-                    <div id="weather-desc" style="color:var(--accent); font-weight: 700; font-size: 0.9rem;">Worcester</div>
-                    <div id="w-condition" style="color:var(--dim); font-size: 0.75rem; text-transform: capitalize;">Checking sky...</div>
+                    <div style="color:var(--accent); font-weight: 700; font-size: 0.85rem;">Worcester</div>
+                    <div id="w-condition" style="color:var(--dim); font-size: 0.7rem; text-transform: capitalize;">...</div>
                     <div class="weather-forecast" id="forecast-cont"></div>
                 </div>
             </div>
             
-            <div class="tile"><h3>🍲 Dinner</h3><div id="home-dinner" style="font-size: 1.2rem; color: var(--accent);">...</div></div>
+            <div class="tile"><h3>🍲 Dinner</h3><div id="home-dinner" style="font-size: 1.1rem; color: var(--accent);">...</div></div>
             <div class="tile">
                 <h3>✨ Fun</h3>
-                <div id="daily-quote" style="font-style: italic; color: var(--accent); margin-bottom: 5px; font-size: 0.75rem; line-height: 1.2;">"Loading..."</div>
-                <div id="daily-joke" style="font-size: 0.7rem; border-top: 1px solid rgba(128,128,128,0.1); padding-top:5px;">Loading...</div>
+                <div id="daily-quote" style="font-style: italic; color: var(--accent); margin-bottom: 3px; font-size: 0.7rem; line-height: 1.1;">"Loading..."</div>
+                <div id="daily-joke" style="font-size: 0.65rem; border-top: 1px solid rgba(128,128,128,0.1); pt:3px;">...</div>
             </div>
             
-            <div class="tile" style="grid-column: 1 / span 2;"><h3>📝 Latest Note</h3><div id="home-note-preview" style="font-size: 0.95rem;">...</div></div>
+            <div class="tile" style="grid-column: 1 / span 2;"><h3>📝 Latest Note</h3><div id="home-note-preview" style="font-size: 0.9rem;">...</div></div>
             
             <div class="home-calendar-strip">
                 <div class="person-day" style="--c:var(--Michelle)"><h4>Michelle</h4><div id="day-Michelle"></div></div>
@@ -106,14 +111,13 @@
         </div>
     </div>
 
-    <!-- TABS (SAME AS V13) -->
+    <!-- TABS -->
     <div id="calendar" class="tab-content"><div id="week-grid-container"></div></div>
-    <div id="meals" class="tab-content"><div style="padding:20px;"><h2>Meals</h2><div id="meal-list"></div></div></div>
-    <div id="tasks" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between;"><h2>Tasks</h2><button class="edit-btn" onclick="addTask()">+ New</button></div><div id="task-list" style="padding:0 20px;"></div></div>
-    <div id="groceries" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between;"><h2>Shop</h2><button class="edit-btn" onclick="addGrocery()">+ Add</button></div><div id="grocery-list" style="padding:0 20px;"></div></div>
-    <div id="notes" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between;"><h2>Notes</h2><button class="edit-btn" onclick="addNote()">+ Add</button></div><div id="note-list" style="padding:0 20px;"></div></div>
+    <div id="meals" class="tab-content"><div style="padding:15px;"><h2>Meals</h2><div id="meal-list"></div></div></div>
+    <div id="tasks" class="tab-content"><div style="padding:15px; display:flex; justify-content:space-between;"><h2>Tasks</h2><button class="edit-btn" onclick="addTask()">+ New</button></div><div id="task-list" style="padding:0 15px;"></div></div>
+    <div id="groceries" class="tab-content"><div style="padding:15px; display:flex; justify-content:space-between;"><h2>Shop</h2><button class="edit-btn" onclick="addGrocery()">+ Add</button></div><div id="grocery-list" style="padding:0 15px;"></div></div>
+    <div id="notes" class="tab-content"><div style="padding:15px; display:flex; justify-content:space-between;"><h2>Notes</h2><button class="edit-btn" onclick="addNote()">+ Add</button></div><div id="note-list" style="padding:0 15px;"></div></div>
 
-    <!-- COMPACT NAV -->
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span class="nav-label">HOME</span></div>
         <div class="nav-item" onclick="switchTab('calendar', this)"><span class="nav-icon">📅</span><span class="nav-label">CALENDAR</span></div>
@@ -124,6 +128,7 @@
     </nav>
 
     <script>
+        // CONFIG
         const GOOGLE_API_KEY = 'AIzaSyCBb3Uu--Sr21o65TUddUBIPfLfQwZsV_o';
         const FAMILY_CALENDARS = { Michelle: 'malvcomp@gmail.com', Paul: '9f686e18312a637015a36791d26311728da7240728adf8dda932c5cabc13456e@group.calendar.google.com', Ella: '361ba78ae3e35bf7a888ebef5f4cbf436be8049abdfa4680f566e36c1a872e7a@group.calendar.google.com', Ivy: '4993c431444a8a1fe2cc3ff0e4615c2b1b3cc8b53b65b8b5b5c5b4bd06c0aeb7@group.calendar.google.com' };
         
@@ -143,22 +148,44 @@
                 document.getElementById('w-icon').innerText = info[0];
                 document.getElementById('w-condition').innerText = info[1];
                 document.getElementById('ss-weather').innerText = `${info[0]} ${Math.round(cur.temperature)}° Worcester`;
-                
                 let fHtml = '';
                 const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
                 for(let i=1; i<4; i++) {
                     let d = new Date(); d.setDate(d.getDate() + i);
                     let icon = weatherMap[data.daily.weathercode[i]] ? weatherMap[data.daily.weathercode[i]][0] : "☀️";
-                    fHtml += `<div class="forecast-day">${dayNames[d.getDay()]}<br>${icon}<br><b>${Math.round(data.daily.temperature_2m_max[i])}°</b></div>`;
+                    fHtml += `<div class="forecast-day">${dayNames[d.getDay()]}<br>${icon} ${Math.round(data.daily.temperature_2m_max[i])}°</div>`;
                 }
                 document.getElementById('forecast-cont').innerHTML = fHtml;
             } catch(e) {}
         }
 
-        // CALENDAR & AGENDA
+        // CALENDAR Logic (Restored Build Function)
         async function fetchEvents(name) {
             const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(FAMILY_CALENDARS[name])}/events?key=${GOOGLE_API_KEY}&timeMin=${new Date().toISOString()}&singleEvents=true&orderBy=startTime&maxResults=5`;
             const res = await fetch(url); const data = await res.json(); return data.items || [];
+        }
+
+        async function buildWeeklyCalendar() {
+            const container = document.getElementById('week-grid-container');
+            container.innerHTML = '<p style="text-align:center; padding:50px;">Refreshing...</p>';
+            let allEvs = [];
+            for (const name in FAMILY_CALENDARS) {
+                const evs = await fetchEvents(name);
+                evs.forEach(e => {
+                    let d = new Date(e.start.dateTime || e.start.date);
+                    allEvs.push({ ...e, person: name, key: d.toDateString() });
+                });
+            }
+            const days = []; for(let i=0; i<7; i++) { let d = new Date(); d.setDate(d.getDate()+i); days.push(d); }
+            let html = '<div class="week-grid">';
+            days.forEach(day => {
+                html += `<div class="day-col"><div class="day-header"><small>${day.toLocaleDateString('en-GB',{weekday:'short'})}</small><br><b>${day.getDate()}</b></div>`;
+                allEvs.filter(e => e.key === day.toDateString()).forEach(e => {
+                    html += `<div class="cal-event" style="--c:var(--${e.person})">${e.summary}</div>`;
+                });
+                html += '</div>';
+            });
+            container.innerHTML = html + '</div>';
         }
 
         async function updateAgendas() {
@@ -169,34 +196,35 @@
                 const homeCont = document.getElementById(`day-${name}`);
                 homeCont.innerHTML = '';
                 let personEvents = evs.filter(e => new Date(e.start.dateTime || e.start.date).toDateString() === today).slice(0,2);
-                
                 personEvents.forEach(e => { homeCont.innerHTML += `<div class="mini-event">• ${e.summary}</div>`; });
                 if(homeCont.innerHTML === '') homeCont.innerHTML = '<span style="color:var(--dim); font-size:0.6rem;">Clear</span>';
-                
-                if(personEvents.length > 0) {
-                    ssHtml += `<div class="ss-person" style="--c:var(--${name})"><b>${name}</b><br>${personEvents[0].summary}</div>`;
-                }
+                if(personEvents.length > 0) ssHtml += `<div class="ss-person" style="--c:var(--${name})"><b>${name}</b><br>${personEvents[0].summary}</div>`;
             }
             document.getElementById('ss-agenda').innerHTML = ssHtml;
         }
 
-        // NOTES (FIXED)
-        window.addNote = () => { const text = prompt("Note:"); if(text) db.ref('notes').push({ text, timestamp: Date.now() }); };
+        // FIREBASE
+        window.addNote = () => { const t = prompt("Note:"); if(t) db.ref('notes').push({ text: t }); };
         db.ref('notes').on('value', snap => {
             const list = document.getElementById('note-list'); list.innerHTML = '';
             const data = snap.val(); let last = "No notes";
             if(data) {
                 Object.keys(data).reverse().forEach(id => {
                     last = data[id].text;
-                    const div = document.createElement('div'); div.className = 'list-item';
-                    div.innerHTML = `<span>${data[id].text}</span><button class="delete-btn" onclick="firebase.database().ref('notes/${id}').remove()">✕</button>`;
-                    list.appendChild(div);
+                    list.innerHTML += `<div class="list-item"><span>${data[id].text}</span><button style="color:red; background:none; border:none;" onclick="firebase.database().ref('notes/${id}').remove()">✕</button></div>`;
                 });
             }
             document.getElementById('home-note-preview').innerText = last;
         });
 
         // SYSTEM
+        function updateSystemState() {
+            const h = new Date().getHours();
+            const ov = document.getElementById('brightness-overlay');
+            if (h >= 7 && h < 19) document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode');
+            if (h >= 0 && h < 6) ov.style.opacity = "1"; else if (h >= 21 || h < 7) ov.style.opacity = "0.5"; else ov.style.opacity = "0";
+        }
+
         let idle = 0;
         function resetTimer() { idle = 0; document.getElementById('screensaver').style.display = 'none'; }
         setInterval(() => {
@@ -204,40 +232,52 @@
             if(idle >= 30) {
                 const ss = document.getElementById('screensaver');
                 ss.style.display = 'flex';
-                ss.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200')`;
+                ss.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200')`;
             }
         }, 10000);
 
-        setInterval(() => {
-            const n = new Date();
-            const timeStr = n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-            const dateStr = n.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-            document.getElementById('clock').innerText = timeStr;
-            document.getElementById('ss-clock').innerText = timeStr;
-            document.getElementById('date-string').innerText = dateStr;
-            document.getElementById('ss-date').innerText = dateStr;
-        }, 1000);
-
-        // INITIAL LOAD
-        fetchWeather(); updateAgendas();
-        
-        // Tab switching and other functions kept exactly as V13
         window.switchTab = (id, el) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active'); el.classList.add('active');
+            if(id === 'calendar') buildWeeklyCalendar();
         };
+
+        async function fetchFun() {
+            try {
+                const j = await (await fetch('https://v2.jokeapi.dev/joke/Any?safe-mode&type=single')).json();
+                document.getElementById('daily-joke').innerText = j.joke || "What do you call a fake noodle? An Impasta.";
+                const q = await (await fetch('https://dummyjson.com/quotes/random')).json();
+                document.getElementById('daily-quote').innerText = `"${q.quote}" - ${q.author}`;
+            } catch(e) { console.log(e); }
+        }
+
+        setInterval(() => {
+            const n = new Date();
+            const tStr = n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+            const dStr = n.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+            document.getElementById('clock').innerText = tStr;
+            document.getElementById('ss-clock').innerText = tStr;
+            document.getElementById('date-string').innerText = dStr;
+            document.getElementById('ss-date').innerText = dStr;
+            updateSystemState();
+        }, 1000);
+
+        // INITIAL LOAD
+        fetchWeather(); updateAgendas(); fetchFun();
+        
+        // RE-LINK FIREBASE FOR OTHER TABS
         window.addTask = () => { const t = prompt("Task:"); if(t) db.ref('tasks').push({ text: t, done: false }); };
         db.ref('tasks').on('value', snap => {
             const list = document.getElementById('task-list'); list.innerHTML = '';
             const data = snap.val();
-            for(let id in data) list.innerHTML += `<div class="list-item"><span style="text-decoration:${data[id].done?'line-through':''}" onclick="db.ref('tasks/${id}').update({done:${!data[id].done}})">${data[id].text}</span><button class="delete-btn" onclick="db.ref('tasks/${id}').remove()">✕</button></div>`;
+            for(let id in data) list.innerHTML += `<div class="list-item"><span style="text-decoration:${data[id].done?'line-through':''}" onclick="db.ref('tasks/${id}').update({done:${!data[id].done}})">${data[id].text}</span><button style="color:red; background:none; border:none;" onclick="db.ref('tasks/${id}').remove()">✕</button></div>`;
         });
         window.addGrocery = () => { const t = prompt("Item:"); if(t) db.ref('groceries').push({ text: t, done: false }); };
         db.ref('groceries').on('value', snap => {
             const list = document.getElementById('grocery-list'); list.innerHTML = '';
             const data = snap.val();
-            for(let id in data) list.innerHTML += `<div class="list-item"><span style="text-decoration:${data[id].done?'line-through':''}" onclick="db.ref('groceries/${id}').update({done:${!data[id].done}})">${data[id].text}</span><button class="delete-btn" onclick="db.ref('groceries/${id}').remove()">✕</button></div>`;
+            for(let id in data) list.innerHTML += `<div class="list-item"><span style="text-decoration:${data[id].done?'line-through':''}" onclick="db.ref('groceries/${id}').update({done:${!data[id].done}})">${data[id].text}</span><button style="color:red; background:none; border:none;" onclick="db.ref('groceries/${id}').remove()">✕</button></div>`;
         });
         db.ref('meals').on('value', snap => {
             const m = snap.val() || {}; const list = document.getElementById('meal-list'); list.innerHTML = '';
