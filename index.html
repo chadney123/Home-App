@@ -15,7 +15,319 @@
             --Michelle: #e74c3c; --Paul: #3498db; --Ella: #2ecc71; --Ivy: #f1c40f;
             --grad: linear-gradient(135deg, #3498db, #2980b9);
         }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Family Hub Pro</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
 
+    <style>
+        :root {
+            --bg: #000; --card: #141414; --text: #fff; --dim: #888; --accent: #3498db;
+            --Michelle: #e74c3c; --Paul: #3498db; --Ella: #2ecc71; --Ivy: #f1c40f;
+            --grad: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* Note: increased padding-bottom to make room for nav + photos */
+        .tab-content { flex-grow: 1; display: none; height: 100%; overflow-y: auto; padding-bottom: 220px; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- HOME SCREEN --- */
+        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; box-sizing: border-box; }
+        .header-tile { grid-column: 1 / span 2; display: flex; justify-content: space-between; align-items: center; }
+        .clock-tile h1 { font-size: 5.5rem; margin: 0; font-weight: 700; letter-spacing: -3px; transition: 0.3s; }
+        .tile { background: var(--card); border-radius: 24px; padding: 20px; border: 1px solid #222; }
+        .tile h3 { margin: 0 0 12px 0; color: var(--dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- DAY VIEW STRIP --- */
+        .home-calendar-strip { grid-column: 1 / span 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 5px; }
+        .person-day { background: #0a0a0a; border-radius: 15px; padding: 15px; border-top: 4px solid var(--c); min-height: 70px; }
+        .person-day h4 { margin: 0 0 8px 0; font-size: 0.9rem; }
+        .event-mini { font-size: 0.7rem; color: #fff; background: rgba(255,255,255,0.1); padding: 3px 6px; border-radius: 4px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* --- CALENDAR TAB INTERFACE --- */
+        .cal-selector { display: flex; gap: 10px; padding: 20px; overflow-x: auto; }
+        .person-btn { 
+            padding: 12px 24px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer;
+            background: #222; color: #fff; flex-shrink: 0; transition: 0.2s;
+        }
+        .person-btn.active { transform: scale(1.05); border: 2px solid #fff; }
+        .event-row { background: #111; padding: 15px; border-radius: 15px; margin-bottom: 10px; border-left: 5px solid var(--c); }
+
+        /* --- GENERAL UI --- */
+        .add-btn-round { background: var(--grad); color: white; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 1.5rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .edit-btn { background: #333; color: #fff; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 0.9rem; }
+        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: #1a1a1a; margin-bottom: 8px; border-radius: 16px; border: 1px solid #222;}
+        
+        #screensaver { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; display: none; justify-content: center; align-items: center; }
+        #screensaver h1 { font-size: 8rem; opacity: 0.5; font-weight: 300; }
+
+        /* --- BOTTOM NAV & ROLLING PHOTOS --- */
+        .photo-scroller {
+            position: fixed; bottom: 85px; width: 100%; height: 100px; 
+            background: #000; overflow: hidden; white-space: nowrap; border-top: 1px solid #222;
+        }
+        .photo-track {
+            display: inline-block; height: 100%;
+            /* 40s determines the speed. Change it to go faster or slower */
+            animation: scrollPhotos 40s linear infinite;
+        }
+        .photo-track img {
+            height: 80px; margin-top: 10px; margin-left: 10px; border-radius: 8px; object-fit: cover;
+        }
+        @keyframes scrollPhotos {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } /* Scrolls exactly half the track to loop perfectly */
+        }
+
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: #050505; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 100; }
+        .nav-item { color: var(--dim); text-align: center; cursor: pointer; flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .nav-item.active { color: var(--accent); }
+        .nav-icon { font-size: 1.6rem; margin-bottom: 4px; }
+        .nav-text { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* --- MOBILE SCALING (RESPONSIVE) --- */
+        @media (max-width: 768px) {
+            .home-grid { grid-template-columns: 1fr; gap: 10px; }
+            .header-tile { grid-column: 1; flex-direction: column; align-items: flex-start; }
+            .clock-tile h1 { font-size: 4rem; }
+            .tile { grid-column: 1 !important; } /* Forces all tiles to 1 column */
+            
+            /* Stacks the 4 family members into a 2x2 grid on phones */
+            .home-calendar-strip { grid-column: 1; grid-template-columns: 1fr 1fr; }
+            
+            /* Shrink bottom stuff slightly for small screens */
+            .photo-scroller { height: 80px; bottom: 70px; }
+            .photo-track img { height: 60px; }
+            .bottom-nav { height: 70px; }
+            .nav-icon { font-size: 1.3rem; }
+            .tab-content { padding-bottom: 170px; }
+        }
+    </style>
+</head>
+<body onmousemove="resetTimer()" onclick="resetTimer()" ontouchstart="resetTimer()">
+
+    <div id="screensaver" onclick="hideScreensaver()"><h1 id="ss-clock">00:00</h1></div>
+
+    <!-- 1. HOME TAB -->
+    <div id="home" class="tab-content active">
+        <div class="home-grid">
+            <div class="header-tile">
+                <div class="clock-tile"><h1 id="clock">00:00</h1><p id="date-string">...</p></div>
+                <div style="text-align: right;"><div id="temp" style="font-size: 2rem; font-weight: 700;">18°C</div><div style="color:var(--dim)">Evesham, UK</div></div>
+            </div>
+            <div class="tile"><h3>🍲 Dinner</h3><div id="home-dinner" style="font-size: 1.5rem; font-weight: 600; color: #fff;">Loading...</div></div>
+            <div class="tile"><h3>✅ Tasks</h3><div id="home-tasks-preview" style="font-size: 1.1rem; font-weight: 500;">No tasks</div></div>
+            <div class="tile" style="grid-column: 1 / span 2;"><h3>📝 Latest Note</h3><div id="home-note-preview" style="font-size: 1rem; color: #ccc;">No notes yet.</div></div>
+            <div class="tile" style="grid-column: 1 / span 2; text-align: center; padding: 15px;"><span id="quote-display" style="font-style: italic; color: #aaa; font-size: 1.1rem;">"Family is everything."</span></div>
+            <div class="home-calendar-strip">
+                <div class="person-day" style="--c:var(--Michelle)"><h4>Michelle</h4><div id="day-Michelle" style="color:var(--dim); font-size:0.75rem;">Syncing...</div></div>
+                <div class="person-day" style="--c:var(--Paul)"><h4>Paul</h4><div id="day-Paul" style="color:var(--dim); font-size:0.75rem;">Syncing...</div></div>
+                <div class="person-day" style="--c:var(--Ella)"><h4>Ella</h4><div id="day-Ella" style="color:var(--dim); font-size:0.75rem;">Syncing...</div></div>
+                <div class="person-day" style="--c:var(--Ivy)"><h4>Ivy</h4><div id="day-Ivy" style="color:var(--dim); font-size:0.75rem;">Syncing...</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. CALENDAR TAB -->
+    <div id="calendar" class="tab-content">
+        <h2>Family Schedules</h2>
+        <div class="cal-selector">
+            <button class="person-btn" style="background:var(--Michelle)" onclick="selectPerson('Michelle')">Michelle</button>
+            <button class="person-btn" style="background:var(--Paul)" onclick="selectPerson('Paul')">Paul</button>
+            <button class="person-btn" style="background:var(--Ella)" onclick="selectPerson('Ella')">Ella</button>
+            <button class="person-btn" style="background:var(--Ivy)" onclick="selectPerson('Ivy')">Ivy</button>
+        </div>
+        <div id="calendar-results" style="padding: 0 20px;">
+            <p style="color:var(--dim); text-align:center;">Select a name above to view their schedule</p>
+        </div>
+    </div>
+
+    <!-- REST OF TABS -->
+    <div id="meals" class="tab-content"><div style="padding:20px;"><h2>Weekly Meal Plan</h2><div id="meal-list"></div></div></div>
+    <div id="tasks" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between; align-items:center;"><h2>Tasks</h2><button class="add-btn-round" onclick="addTask()">+</button></div><div id="task-list" style="padding:0 20px;"></div></div>
+    <div id="groceries" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between; align-items:center;"><h2>Groceries</h2><button class="add-btn-round" onclick="addGrocery()">+</button></div><div id="grocery-list" style="padding:0 20px;"></div></div>
+    <div id="notes" class="tab-content"><div style="padding:20px; display:flex; justify-content:space-between; align-items:center;"><h2>Notes</h2><button class="add-btn-round" onclick="addNote()">+</button></div><div id="note-list" style="padding:0 20px;"></div></div>
+
+    <!-- ROLLING PHOTOS -->
+    <div class="photo-scroller">
+        <!-- We create the track twice inside the wrapper so it loops seamlessly -->
+        <div class="photo-track">
+            <!-- REPLACE THESE URLS WITH YOUR OWN IMAGES -->
+            <img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?w=300&q=80" alt="Family">
+            <img src="https://images.unsplash.com/photo-1542037104857-ffbb0b9155fb?w=300&q=80" alt="Family">
+            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=300&q=80" alt="Family">
+            <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=300&q=80" alt="Family">
+            <img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?w=300&q=80" alt="Family">
+            <img src="https://images.unsplash.com/photo-1542037104857-ffbb0b9155fb?w=300&q=80" alt="Family">
+            <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=300&q=80" alt="Family">
+            <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=300&q=80" alt="Family">
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></div>
+        <div class="nav-item" onclick="switchTab('calendar', this)"><span class="nav-icon">📅</span><span class="nav-text">Calendar</span></div>
+        <div class="nav-item" onclick="switchTab('meals', this)"><span class="nav-icon">🍲</span><span class="nav-text">Meals</span></div>
+        <div class="nav-item" onclick="switchTab('tasks', this)"><span class="nav-icon">✅</span><span class="nav-text">Tasks</span></div>
+        <div class="nav-item" onclick="switchTab('groceries', this)"><span class="nav-icon">🛒</span><span class="nav-text">Groceries</span></div>
+        <div class="nav-item" onclick="switchTab('notes', this)"><span class="nav-icon">📝</span><span class="nav-text">Notes</span></div>
+    </nav>
+
+    <script>
+        // --- GOOGLE CONFIG (PASTE YOURS HERE) ---
+        const GOOGLE_API_KEY = 'AIzaSyCBb3Uu--Sr21o65TUddUBIPfLfQwZsV_o';
+        const FAMILY_CALENDARS = {
+            Michelle: 'f530723b3c2df77470e054a97e85e787334b82173a70dd3e1bf22ac993b50865@group.calendar.google.com',
+            Paul: 'f530723b3c2df77470e054a97e85e787334b82173a70dd3e1bf22ac993b50865@group.calendar.google.com',
+            Ella: 'f530723b3c2df77470e054a97e85e787334b82173a70dd3e1bf22ac993b50865@group.calendar.google.com',
+            Ivy: 'f530723b3c2df77470e054a97e85e787334b82173a70dd3e1bf22ac993b50865@group.calendar.google.com'
+        };
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBb3Uu--Sr21o65TUddUBIPfLfQwZsV_o",
+            authDomain: "familyhub-fb842.firebaseapp.com",
+            databaseURL: "https://familyhub-fb842-default-rtdb.firebaseio.com",
+            projectId: "familyhub-fb842",
+            storageBucket: "familyhub-fb842.firebasestorage.app",
+            messagingSenderId: "459204148820",
+            appId: "1:459204148820:web:9808286292bbb322e3b7c1"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // --- CALENDAR LOGIC ---
+        async function fetchEvents(name, limit = 10) {
+            const email = FAMILY_CALENDARS[name];
+            if(email.includes('PASTE_')) return null; // Safety catch if not filled out yet
+            
+            const timeMin = new Date().toISOString();
+            const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(email)}/events?key=${GOOGLE_API_KEY}&timeMin=${timeMin}&singleEvents=true&orderBy=startTime&maxResults=${limit}`;
+            
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.error) return null;
+                return data.items || [];
+            } catch (e) { return null; }
+        }
+
+        async function selectPerson(name) {
+            const results = document.getElementById('calendar-results');
+            results.innerHTML = `<p style="text-align:center;">Fetching ${name}'s schedule...</p>`;
+            
+            const events = await fetchEvents(name, 15);
+            results.innerHTML = `<h3>${name}'s Upcoming Week</h3>`;
+            
+            if (!events || events.length === 0) {
+                results.innerHTML += `<p style="color:var(--dim)">No upcoming events found. (Or API key not set)</p>`;
+                return;
+            }
+
+            events.forEach(event => {
+                const start = event.start.dateTime ? new Date(event.start.dateTime).toLocaleString([], {weekday:'short', hour:'2-digit', minute:'2-digit'}) : 'All Day';
+                const div = document.createElement('div');
+                div.className = 'event-row';
+                div.style.setProperty('--c', `var(--${name})`);
+                div.innerHTML = `<div style="color:var(--dim); font-size:0.8rem;">${start}</div><div style="font-size:1.1rem; font-weight:bold;">${event.summary}</div>`;
+                results.appendChild(div);
+            });
+        }
+
+        async function syncHomeStrip() {
+            for (const name in FAMILY_CALENDARS) {
+                const events = await fetchEvents(name, 2);
+                const container = document.getElementById(`day-${name}`);
+                if (events && events.length > 0) {
+                    container.innerHTML = '';
+                    events.forEach(e => {
+                        const div = document.createElement('div');
+                        div.className = 'event-mini';
+                        div.innerText = e.summary;
+                        container.appendChild(div);
+                    });
+                } else {
+                    container.innerText = 'Free';
+                }
+            }
+        }
+
+        // --- SYSTEM LOGIC ---
+        let idleTime = 0;
+        function resetTimer() { idleTime = 0; hideScreensaver(); }
+        setInterval(() => { idleTime++; if (idleTime >= 120) document.getElementById('screensaver').style.display = 'flex'; }, 1000);
+        function hideScreensaver() { document.getElementById('screensaver').style.display = 'none'; }
+
+        const quotes = ["Home is where our story begins.", "Focus on the good.", "Happiness is homemade.", "Choose kindness today."];
+        document.getElementById('quote-display').innerText = `"${quotes[Math.floor(Math.random()*quotes.length)]}"`;
+
+        const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        window.editMeal = (day, currentMeal) => { const m = prompt(`What's for dinner on ${day}?`, currentMeal); if (m !== null) db.ref('meals/' + day).set(m); };
+        db.ref('meals').on('value', snap => {
+            const meals = snap.val() || {}; const list = document.getElementById('meal-list'); list.innerHTML = '';
+            weekdays.forEach(day => {
+                const row = document.createElement('div'); row.className = 'list-item';
+                row.innerHTML = `<div style="display:flex; align-items:center; gap:15px; width:100%;"><span style="font-weight:bold; color:var(--accent); width:100px;">${day}</span><span style="flex-grow:1; color:${meals[day] ? '#fff' : '#666'};">${meals[day] || "Tap edit..."}</span><button class="edit-btn" onclick="editMeal('${day}', '${meals[day] || ''}')">✎ Edit</button></div>`;
+                list.appendChild(row);
+            });
+            const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+            document.getElementById('home-dinner').innerText = meals[todayName] || "No meal set";
+        });
+
+        window.addGrocery = () => { const item = prompt("Add to shopping list:"); if (item) db.ref('groceries').push({ text: item, done: false }); };
+        db.ref('groceries').on('value', snap => {
+            const list = document.getElementById('grocery-list'); list.innerHTML = ''; const data = snap.val();
+            for (let id in data) {
+                const row = document.createElement('div'); row.className = 'list-item'; row.style.opacity = data[id].done ? '0.3' : '1';
+                row.innerHTML = `<div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="firebase.database().ref('groceries/${id}').update({done: ${!data[id].done}})"><span style="font-size:1.3rem;">${data[id].done ? '✅' : '🛒'}</span><span style="text-decoration: ${data[id].done ? 'line-through' : 'none'};">${data[id].text}</span></div><button class="edit-btn" style="background:#e74c3c; padding:6px 10px;" onclick="firebase.database().ref('groceries/${id}').remove()">X</button>`;
+                list.appendChild(row);
+            }
+        });
+
+        window.addTask = () => { const t = prompt("New Task:"); if(t) db.ref('tasks').push({ text: t, done: false }); };
+        db.ref('tasks').on('value', snap => {
+            const list = document.getElementById('task-list'); const homePrev = document.getElementById('home-tasks-preview'); list.innerHTML = '';
+            const data = snap.val(); let count = 0;
+            for(let id in data) { if(!data[id].done) count++; const row = document.createElement('div'); row.className = 'list-item'; row.style.opacity = data[id].done ? '0.3' : '1'; row.onclick = () => db.ref('tasks/'+id).update({done: !data[id].done}); row.innerHTML = `<span>${data[id].done ? '✅' : '⭕️'} ${data[id].text}</span>`; list.appendChild(row); }
+            homePrev.innerText = count > 0 ? `${count} remaining` : "Done!";
+        });
+
+        window.addNote = () => { const text = prompt("Note:"); if (text) db.ref('notes').push({ text, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) }); };
+        db.ref('notes').on('value', snap => {
+            const list = document.getElementById('note-list'); const preview = document.getElementById('home-note-preview'); list.innerHTML = '';
+            const data = snap.val(); let lastNote = "";
+            for (let id in data) { lastNote = data[id].text; const card = document.createElement('div'); card.className = 'note-card'; card.innerHTML = `<div>${data[id].text}</div><div style="font-size:0.75rem; color:var(--dim); margin-top:8px;">${data[id].time}</div>`; list.prepend(card); }
+            preview.innerText = lastNote || "No notes.";
+        });
+
+        window.switchTab = (id, el) => {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+            if(id === 'home') syncHomeStrip();
+        };
+
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            document.getElementById('ss-clock').innerText = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            document.getElementById('date-string').innerText = now.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'});
+        }, 1000);
+
+        syncHomeStrip();
+    </script>
+</body>
+</html>
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
         /* Navigation */
