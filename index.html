@@ -3,219 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Family Hub - Home</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <title>Cozyla Hub</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #000000;
-            --card-bg: #111111;
-            --text-main: #ffffff;
-            --text-dim: #888888;
-            --accent-blue: #3498db;
-            --accent-green: #2ecc71;
-            --accent-red: #e74c3c;
-            --accent-orange: #f39c12;
+            --bg: #000; --card: #121212; --text: #fff; --dim: #888; --accent: #3498db;
+            /* Family Color Palette */
+            --mom: #e74c3c; --dad: #3498db; --kid1: #2ecc71; --kid2: #f1c40f;
         }
 
-        body {
-            margin: 0;
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* Navigation */
+        .tab-content { flex-grow: 1; display: none; overflow-y: auto; padding-bottom: 100px; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Top Header: Time, Date, Weather */
-        .header {
-            padding: 40px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
+        /* HOME SCREEN: TILED LAYOUT */
+        .home-grid { display: grid; grid-template-columns: 1.5fr 1fr; grid-template-rows: auto 1fr auto; gap: 15px; padding: 20px; box-sizing: border-box; height: 100%; }
+        .header-tile { grid-column: 1 / span 2; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; }
+        .clock-tile h1 { font-size: 6rem; margin: 0; font-weight: 700; letter-spacing: -2px; }
+        .clock-tile p { font-size: 1.8rem; color: var(--dim); margin: 0; }
+        
+        .tile { background: var(--card); border-radius: 24px; padding: 25px; border: 1px solid #222; }
+        .tile h3 { margin: 0 0 15px 0; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #333; padding-bottom: 10px; }
 
-        .time-section h1 {
-            font-size: 7rem;
-            margin: 0;
-            font-weight: 700;
-            line-height: 1;
-        }
+        /* CALENDAR TAB: VERTICAL FAMILY GRID */
+        .calendar-container { padding: 20px; height: 100%; display: flex; flex-direction: column; }
+        .family-header { display: grid; grid-template-columns: 100px repeat(4, 1fr); gap: 10px; margin-bottom: 10px; position: sticky; top: 0; z-index: 10; background: var(--bg); }
+        .name-box { padding: 15px; border-radius: 12px; text-align: center; font-weight: 700; color: #000; text-transform: uppercase; }
+        
+        .vertical-grid { display: grid; grid-template-columns: 100px repeat(4, 1fr); gap: 10px; overflow-y: auto; flex-grow: 1; }
+        .day-label { color: var(--dim); font-weight: 700; padding: 20px 0; text-align: center; border-right: 1px solid #222; }
+        .calendar-cell { background: #080808; border-radius: 12px; min-height: 120px; padding: 10px; border: 1px dashed #222; }
+        .event-bar { padding: 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; color: #000; margin-bottom: 5px; }
 
-        .time-section p {
-            font-size: 1.8rem;
-            color: var(--text-dim);
-            margin: 10px 0 0 5px;
-        }
+        /* Bottom Menu */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: rgba(10,10,10,0.95); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; backdrop-filter: blur(10px); }
+        .nav-item { color: var(--dim); text-align: center; cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); transform: translateY(-5px); }
+        .nav-icon { font-size: 1.6rem; margin-bottom: 4px; }
 
-        .weather-widget {
-            text-align: right;
-            background: var(--card-bg);
-            padding: 20px 30px;
-            border-radius: 25px;
-            border: 1px solid #222;
-        }
-
-        .weather-temp { font-size: 3rem; font-weight: 700; color: var(--accent-blue); }
-        .weather-desc { font-size: 1.2rem; color: var(--text-dim); text-transform: capitalize; }
-
-        /* Main Grid: Calendar, Chores, Dinner */
-        .home-grid {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            grid-template-rows: 1fr 200px; /* Top row for lists, bottom for dinner/quote */
-            gap: 20px;
-            padding: 0 50px 30px 50px;
-            flex-grow: 1;
-        }
-
-        .tile {
-            background: var(--card-bg);
-            border-radius: 30px;
-            padding: 25px;
-            border: 1px solid #222;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tile h2 {
-            margin: 0 0 20px 0;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-dim);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* List Styling */
-        .list-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #222;
-            font-size: 1.2rem;
-        }
-
-        .list-item:last-child { border: none; }
-
-        .time-label {
-            color: var(--accent-red);
-            font-weight: 700;
-            width: 100px;
-            font-size: 1rem;
-        }
-
-        .chore-check {
-            width: 25px;
-            height: 25px;
-            border: 2px solid var(--accent-green);
-            border-radius: 50%;
-            margin-right: 15px;
-        }
-
-        /* Special Tiles */
-        .dinner-tile { grid-column: 1; background: linear-gradient(145deg, #111, #1a1a1a); }
-        .quote-tile { grid-column: 2; display: flex; align-items: center; justify-content: center; text-align: center; font-style: italic; color: #ccc; }
-
-        .dinner-tag {
-            background: var(--accent-orange);
-            color: black;
-            padding: 5px 15px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            display: inline-block;
-        }
+        /* Interactive Elements */
+        .chore-row { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 1.2rem; cursor: pointer; }
+        .check { width: 24px; height: 24px; border: 2px solid #444; border-radius: 6px; }
+        .done .check { background: var(--accent); border-color: var(--accent); display: flex; align-items: center; justify-content: center; }
+        .done .check::after { content: '✓'; color: #fff; font-size: 1rem; }
+        .done span { text-decoration: line-through; color: var(--dim); }
 
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <div class="time-section">
-            <h1 id="clock">00:00</h1>
-            <p id="full-date">Monday, January 1st</p>
-        </div>
-        <div class="weather-widget">
-            <div class="weather-temp" id="weather-temp">--°</div>
-            <div class="weather-desc" id="weather-desc">Loading...</div>
-        </div>
-    </header>
-
-    <main class="home-grid">
-        <!-- Today's Calendar -->
-        <section class="tile">
-            <h2><span>📅</span> Today's Events</h2>
-            <div id="calendar-list">
-                <div class="list-item"><span class="time-label">09:00 AM</span> Morning Standup</div>
-                <div class="list-item"><span class="time-label">03:30 PM</span> Kids Swimming</div>
-                <div class="list-item"><span class="time-label">07:00 PM</span> Dinner Reservation</div>
+    <!-- HOME TAB -->
+    <div id="home" class="tab-content active">
+        <div class="home-grid">
+            <div class="header-tile">
+                <div class="clock-tile">
+                    <h1 id="clock">00:00</h1>
+                    <p id="date">Monday, May 4</p>
+                </div>
+                <div id="weather" style="text-align: right;">
+                    <div id="temp" style="font-size: 3.5rem; font-weight: 700;">--°F</div>
+                    <div id="address" style="color:var(--dim)">Evesham, UK</div>
+                </div>
             </div>
-        </section>
 
-        <!-- Chores -->
-        <section class="tile">
-            <h2><span>✅</span> Chores of the Day</h2>
-            <div id="chore-list">
-                <div class="list-item"><div class="chore-check"></div> Dishwasher</div>
-                <div class="list-item"><div class="chore-check"></div> Fold Laundry</div>
-                <div class="list-item"><div class="chore-check"></div> Vacuum Living Room</div>
+            <div class="tile">
+                <h3>📅 Today's Schedule</h3>
+                <div id="today-events">
+                    <p>8:30 AM - Gym (Mom)</p>
+                    <p>4:00 PM - Soccer (Alex)</p>
+                </div>
             </div>
-        </section>
 
-        <!-- Dinner -->
-        <section class="tile dinner-tile">
-            <div class="dinner-tag">TONIGHT'S MENU</div>
-            <h1 style="margin:10px 0 0 0; font-size: 2.5rem;" id="dinner-text">Grilled Salmon & Asparagus</h1>
-        </section>
+            <div class="tile">
+                <h3>✅ Chores</h3>
+                <div class="chore-row" onclick="this.classList.toggle('done')"><div class="check"></div><span>Empty Dishwasher</span></div>
+                <div class="chore-row" onclick="this.classList.toggle('done')"><div class="check"></div><span>Feed the Dog</span></div>
+            </div>
 
-        <!-- Quote -->
-        <section class="tile quote-tile">
-            <p id="quote-text" style="font-size: 1.2rem; line-height: 1.5;">
-                "The secret of getting ahead is getting started."
-            </p>
-        </section>
-    </main>
+            <div class="tile" style="grid-column: 1">
+                <h3>🍲 Dinner Tonight</h3>
+                <div onclick="editDinner()" id="dinner-val" style="font-size: 1.8rem; font-weight: 600; cursor: pointer;">Tap to set menu...</div>
+            </div>
+
+            <div class="tile" style="text-align: center; display: flex; align-items: center; justify-content: center;">
+                <p id="quote" style="font-style: italic; color: #ccc;">"The secret of getting ahead is getting started."</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CALENDAR TAB -->
+    <div id="calendar" class="tab-content">
+        <div class="calendar-container">
+            <div class="family-header">
+                <div style="background: transparent;"></div>
+                <div class="name-box" style="background: var(--mom)">Mom</div>
+                <div class="name-box" style="background: var(--dad)">Dad</div>
+                <div class="name-box" style="background: var(--kid1)">Alex</div>
+                <div class="name-box" style="background: var(--kid2)">Maya</div>
+            </div>
+            <div class="vertical-grid" id="family-grid">
+                <!-- Days and Rows generated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home', this)"><div class="nav-icon">🏠</div>Home</div>
+        <div class="nav-item" onclick="switchTab('calendar', this)"><div class="nav-icon">📅</div>Calendar</div>
+        <div class="nav-item"><div class="nav-icon">🍲</div>Meals</div>
+        <div class="nav-item"><div class="nav-icon">📸</div>Photos</div>
+    </nav>
 
     <script>
-        // 1. CLOCK & DATE
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: true});
-            
-            const options = { weekday: 'long', month: 'long', day: 'numeric' };
-            document.getElementById('full-date').innerText = now.toLocaleDateString('en-US', options);
+        // 1. NAVIGATION
+        function switchTab(id, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
         }
-        setInterval(updateClock, 1000);
-        updateClock();
 
-        // 2. RANDOM QUOTE LOGIC
+        // 2. WEATHER (Update YOUR_API_KEY below)
+        const API_KEY = 'YOUR_OPENWEATHER_KEY';
+        const HOME_LOCATION = 'Evesham, UK';
+
+        async function updateWeather() {
+            try {
+                // Mocking for preview. When you have a key, uncomment the fetch.
+                // const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${HOME_LOCATION}&units=imperial&appid=${API_KEY}`);
+                // const data = await res.json();
+                document.getElementById('temp').innerText = "64°F";
+                document.getElementById('address').innerText = HOME_LOCATION;
+            } catch (e) { console.log("Weather failed"); }
+        }
+        updateWeather();
+
+        // 3. VERTICAL CALENDAR GENERATOR
+        function renderCalendar() {
+            const grid = document.getElementById('family-grid');
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const startDay = new Date().getDate();
+
+            let html = '';
+            for (let i = 0; i < 7; i++) {
+                const date = new Date();
+                date.setDate(startDay + i);
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                const dayNum = date.getDate();
+
+                html += `<div class="day-label"><div>${dayName}</div><div style="font-size:1.5rem">${dayNum}</div></div>`;
+                // Create 4 cells (one for each person)
+                html += `<div class="calendar-cell"></div>`; // Mom
+                html += `<div class="calendar-cell"></div>`; // Dad
+                html += `<div class="calendar-cell"></div>`; // Alex
+                html += `<div class="calendar-cell"></div>`; // Maya
+            }
+            grid.innerHTML = html;
+        }
+        renderCalendar();
+
+        // 4. INTERACTIVE FEATURES
+        function editDinner() {
+            const current = document.getElementById('dinner-val').innerText;
+            const res = prompt("What's for dinner?", current);
+            if (res) document.getElementById('dinner-val').innerText = res;
+        }
+
         const quotes = [
-            "Family is not an important thing. It's everything.",
-            "The best way to predict the future is to create it.",
-            "Home is where our story begins.",
-            "Happiness is homemade.",
-            "The only way to do great work is to love what you do."
+            "Family is everything.",
+            "Choose kindness every day.",
+            "Focus on the good.",
+            "Home is where our story begins."
         ];
+        document.getElementById('quote').innerText = `"${quotes[Math.floor(Math.random()*quotes.length)]}"`;
 
-        function setRandomQuote() {
-            const quote = quotes[Math.floor(Math.random() * quotes.length)];
-            document.getElementById('quote-text').innerText = `"${quote}"`;
-        }
-        setRandomQuote(); // Changes on refresh or we can set an interval
-
-        // 3. WEATHER PLACEHOLDER LOGIC
-        // We will fill this with your API key later
-        function mockWeather() {
-            document.getElementById('weather-temp').innerText = "72°F";
-            document.getElementById('weather-desc').innerText = "Partly Cloudy";
-        }
-        mockWeather();
-
+        // 5. CLOCK
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('date').innerText = now.toLocaleDateString([], {weekday: 'long', month: 'long', day: 'numeric'});
+        }, 1000);
     </script>
 </body>
 </html>
