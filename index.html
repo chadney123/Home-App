@@ -3,55 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cozyla Hub</title>
+    <title>Family Hub Pro</title>
     <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs (Compat Version for Browser) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --bg: #000; --card: #121212; --text: #fff; --dim: #888; --accent: #3498db;
-            /* Family Color Palette */
+            /* Family Colors */
             --mom: #e74c3c; --dad: #3498db; --kid1: #2ecc71; --kid2: #f1c40f;
         }
 
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* Navigation */
-        .tab-content { flex-grow: 1; display: none; overflow-y: auto; padding-bottom: 100px; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        /* Navigation Logic */
+        .tab-content { flex-grow: 1; display: none; height: 100%; overflow-y: auto; padding-bottom: 90px; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* HOME SCREEN: TILED LAYOUT */
+        /* --- HOME SCREEN TILES --- */
         .home-grid { display: grid; grid-template-columns: 1.5fr 1fr; grid-template-rows: auto 1fr auto; gap: 15px; padding: 20px; box-sizing: border-box; height: 100%; }
-        .header-tile { grid-column: 1 / span 2; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; }
-        .clock-tile h1 { font-size: 6rem; margin: 0; font-weight: 700; letter-spacing: -2px; }
-        .clock-tile p { font-size: 1.8rem; color: var(--dim); margin: 0; }
+        .header-tile { grid-column: 1 / span 2; display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; }
+        .clock-tile h1 { font-size: 6.5rem; margin: 0; font-weight: 700; letter-spacing: -3px; line-height: 1; }
+        .clock-tile p { font-size: 1.8rem; color: var(--dim); margin: 5px 0 0 0; }
         
-        .tile { background: var(--card); border-radius: 24px; padding: 25px; border: 1px solid #222; }
-        .tile h3 { margin: 0 0 15px 0; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .tile { background: var(--card); border-radius: 24px; padding: 25px; border: 1px solid #222; position: relative; }
+        .tile h3 { margin: 0 0 15px 0; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; border-bottom: 1px solid #333; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* CALENDAR TAB: VERTICAL FAMILY GRID */
-        .calendar-container { padding: 20px; height: 100%; display: flex; flex-direction: column; }
-        .family-header { display: grid; grid-template-columns: 100px repeat(4, 1fr); gap: 10px; margin-bottom: 10px; position: sticky; top: 0; z-index: 10; background: var(--bg); }
-        .name-box { padding: 15px; border-radius: 12px; text-align: center; font-weight: 700; color: #000; text-transform: uppercase; }
+        /* --- CALENDAR TAB: VERTICAL GRID --- */
+        .calendar-container { padding: 20px; height: 100%; display: flex; flex-direction: column; box-sizing: border-box; }
+        .family-header { display: grid; grid-template-columns: 100px repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
+        .name-box { padding: 15px; border-radius: 12px; text-align: center; font-weight: 700; color: #000; text-transform: uppercase; font-size: 0.9rem; }
         
-        .vertical-grid { display: grid; grid-template-columns: 100px repeat(4, 1fr); gap: 10px; overflow-y: auto; flex-grow: 1; }
-        .day-label { color: var(--dim); font-weight: 700; padding: 20px 0; text-align: center; border-right: 1px solid #222; }
-        .calendar-cell { background: #080808; border-radius: 12px; min-height: 120px; padding: 10px; border: 1px dashed #222; }
-        .event-bar { padding: 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; color: #000; margin-bottom: 5px; }
+        .vertical-grid { display: grid; grid-template-columns: 100px repeat(4, 1fr); gap: 10px; overflow-y: auto; }
+        .day-label { color: var(--dim); font-weight: 700; padding: 20px 0; text-align: center; border-right: 1px solid #222; display: flex; flex-direction: column; justify-content: center; }
+        .calendar-cell { background: #080808; border-radius: 12px; min-height: 110px; padding: 10px; border: 1px dashed #222; }
 
-        /* Bottom Menu */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: rgba(10,10,10,0.95); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; backdrop-filter: blur(10px); }
-        .nav-item { color: var(--dim); text-align: center; cursor: pointer; transition: 0.3s; }
-        .nav-item.active { color: var(--accent); transform: translateY(-5px); }
-        .nav-icon { font-size: 1.6rem; margin-bottom: 4px; }
-
-        /* Interactive Elements */
-        .chore-row { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 1.2rem; cursor: pointer; }
-        .check { width: 24px; height: 24px; border: 2px solid #444; border-radius: 6px; }
+        /* --- UI ELEMENTS --- */
+        .chore-row { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; font-size: 1.2rem; cursor: pointer; }
+        .check { width: 24px; height: 24px; border: 2px solid #444; border-radius: 6px; flex-shrink: 0; }
         .done .check { background: var(--accent); border-color: var(--accent); display: flex; align-items: center; justify-content: center; }
         .done .check::after { content: '✓'; color: #fff; font-size: 1rem; }
         .done span { text-decoration: line-through; color: var(--dim); }
 
+        .add-btn { background: #333; border: none; color: white; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 1.2rem; line-height: 1; }
+
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(10,10,10,0.98); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; }
+        .nav-item { color: var(--dim); text-align: center; cursor: pointer; font-size: 0.8rem; }
+        .nav-item.active { color: var(--accent); font-weight: bold; }
+        .nav-icon { font-size: 1.8rem; margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -62,41 +66,43 @@
             <div class="header-tile">
                 <div class="clock-tile">
                     <h1 id="clock">00:00</h1>
-                    <p id="date">Monday, May 4</p>
+                    <p id="date-string">Monday, May 4</p>
                 </div>
-                <div id="weather" style="text-align: right;">
-                    <div id="temp" style="font-size: 3.5rem; font-weight: 700;">--°F</div>
-                    <div id="address" style="color:var(--dim)">Evesham, UK</div>
+                <div style="text-align: right;">
+                    <div id="temp" style="font-size: 3.5rem; font-weight: 700;">--°C</div>
+                    <div style="color:var(--dim)">Evesham, UK</div>
                 </div>
             </div>
 
+            <!-- Calendar Widget -->
             <div class="tile">
-                <h3>📅 Today's Schedule</h3>
-                <div id="today-events">
-                    <p>8:30 AM - Gym (Mom)</p>
-                    <p>4:00 PM - Soccer (Alex)</p>
-                </div>
+                <h3>📅 Today's Events</h3>
+                <div id="home-cal-preview" style="color: var(--dim); font-style: italic;">Syncing Google Calendar...</div>
             </div>
 
+            <!-- Chores Widget -->
             <div class="tile">
-                <h3>✅ Chores</h3>
-                <div class="chore-row" onclick="this.classList.toggle('done')"><div class="check"></div><span>Empty Dishwasher</span></div>
-                <div class="chore-row" onclick="this.classList.toggle('done')"><div class="check"></div><span>Feed the Dog</span></div>
+                <h3><span>✅ Chores</span> <button class="add-btn" onclick="addChore()">+</button></h3>
+                <div id="chore-list"></div>
             </div>
 
+            <!-- Dinner Widget -->
             <div class="tile" style="grid-column: 1">
                 <h3>🍲 Dinner Tonight</h3>
-                <div onclick="editDinner()" id="dinner-val" style="font-size: 1.8rem; font-weight: 600; cursor: pointer;">Tap to set menu...</div>
+                <div onclick="editDinner()" id="dinner-display" style="font-size: 1.8rem; font-weight: 600; cursor: pointer; padding: 10px;">
+                    Tap to set menu...
+                </div>
             </div>
 
-            <div class="tile" style="text-align: center; display: flex; align-items: center; justify-content: center;">
-                <p id="quote" style="font-style: italic; color: #ccc;">"The secret of getting ahead is getting started."</p>
+            <!-- Quote Widget -->
+            <div class="tile" style="display: flex; align-items: center; justify-content: center; text-align: center;">
+                <p id="quote-display" style="font-style: italic; color: #ccc; font-size: 1.1rem;"></p>
             </div>
         </div>
     </div>
 
     <!-- CALENDAR TAB -->
-    <div id="calendar" class="tab-content">
+    <div id="calendar-tab" class="tab-content">
         <div class="calendar-container">
             <div class="family-header">
                 <div style="background: transparent;"></div>
@@ -105,21 +111,69 @@
                 <div class="name-box" style="background: var(--kid1)">Alex</div>
                 <div class="name-box" style="background: var(--kid2)">Maya</div>
             </div>
-            <div class="vertical-grid" id="family-grid">
-                <!-- Days and Rows generated by JS -->
+            <div class="vertical-grid" id="family-calendar-grid">
+                <!-- Days generated by JS -->
             </div>
         </div>
     </div>
 
+    <!-- NAVIGATION -->
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', this)"><div class="nav-icon">🏠</div>Home</div>
-        <div class="nav-item" onclick="switchTab('calendar', this)"><div class="nav-icon">📅</div>Calendar</div>
+        <div class="nav-item" onclick="switchTab('calendar-tab', this)"><div class="nav-icon">📅</div>Calendar</div>
         <div class="nav-item"><div class="nav-icon">🍲</div>Meals</div>
         <div class="nav-item"><div class="nav-icon">📸</div>Photos</div>
     </nav>
 
     <script>
-        // 1. NAVIGATION
+        // --- 1. FIREBASE INITIALIZATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBb3Uu--Sr21o65TUddUBIPfLfQwZsV_o",
+            authDomain: "familyhub-fb842.firebaseapp.com",
+            databaseURL: "https://familyhub-fb842-default-rtdb.firebaseio.com",
+            projectId: "familyhub-fb842",
+            storageBucket: "familyhub-fb842.firebasestorage.app",
+            messagingSenderId: "459204148820",
+            appId: "1:459204148820:web:9808286292bbb322e3b7c1"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // --- 2. REAL-TIME DATA SYNC ---
+        
+        // Dinner Sync
+        db.ref('dinner').on('value', (snap) => {
+            document.getElementById('dinner-display').innerText = snap.val() || "Tap to set menu...";
+        });
+
+        function editDinner() {
+            const current = document.getElementById('dinner-display').innerText;
+            const menu = prompt("What's for dinner?", current);
+            if (menu) db.ref('dinner').set(menu);
+        }
+
+        // Chores Sync
+        db.ref('chores').on('value', (snap) => {
+            const list = document.getElementById('chore-list');
+            list.innerHTML = '';
+            const data = snap.val();
+            for (let id in data) {
+                const chore = data[id];
+                const row = document.createElement('div');
+                row.className = `chore-row ${chore.done ? 'done' : ''}`;
+                row.onclick = () => db.ref('chores/' + id).update({ done: !chore.done });
+                row.innerHTML = `<div class="check"></div><span>${chore.text}</span>`;
+                list.appendChild(row);
+            }
+        });
+
+        function addChore() {
+            const text = prompt("New chore:");
+            if (text) db.ref('chores').push({ text: text, done: false });
+        }
+
+        // --- 3. UI & CALENDAR GENERATION ---
         function switchTab(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -127,66 +181,35 @@
             el.classList.add('active');
         }
 
-        // 2. WEATHER (Update YOUR_API_KEY below)
-        const API_KEY = 'YOUR_OPENWEATHER_KEY';
-        const HOME_LOCATION = 'Evesham, UK';
-
-        async function updateWeather() {
-            try {
-                // Mocking for preview. When you have a key, uncomment the fetch.
-                // const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${HOME_LOCATION}&units=imperial&appid=${API_KEY}`);
-                // const data = await res.json();
-                document.getElementById('temp').innerText = "64°F";
-                document.getElementById('address').innerText = HOME_LOCATION;
-            } catch (e) { console.log("Weather failed"); }
-        }
-        updateWeather();
-
-        // 3. VERTICAL CALENDAR GENERATOR
-        function renderCalendar() {
-            const grid = document.getElementById('family-grid');
-            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            const startDay = new Date().getDate();
-
+        function buildVerticalCalendar() {
+            const grid = document.getElementById('family-calendar-grid');
+            const start = new Date();
             let html = '';
             for (let i = 0; i < 7; i++) {
-                const date = new Date();
-                date.setDate(startDay + i);
-                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-                const dayNum = date.getDate();
-
-                html += `<div class="day-label"><div>${dayName}</div><div style="font-size:1.5rem">${dayNum}</div></div>`;
-                // Create 4 cells (one for each person)
-                html += `<div class="calendar-cell"></div>`; // Mom
-                html += `<div class="calendar-cell"></div>`; // Dad
-                html += `<div class="calendar-cell"></div>`; // Alex
-                html += `<div class="calendar-cell"></div>`; // Maya
+                const d = new Date();
+                d.setDate(start.getDate() + i);
+                html += `<div class="day-label"><span>${d.toLocaleDateString('en-US', {weekday:'short'})}</span><span style="font-size:1.4rem; color:white;">${d.getDate()}</span></div>`;
+                for(let j=0; j<4; j++) html += `<div class="calendar-cell"></div>`;
             }
             grid.innerHTML = html;
         }
-        renderCalendar();
+        buildVerticalCalendar();
 
-        // 4. INTERACTIVE FEATURES
-        function editDinner() {
-            const current = document.getElementById('dinner-val').innerText;
-            const res = prompt("What's for dinner?", current);
-            if (res) document.getElementById('dinner-val').innerText = res;
-        }
-
-        const quotes = [
-            "Family is everything.",
-            "Choose kindness every day.",
-            "Focus on the good.",
-            "Home is where our story begins."
-        ];
-        document.getElementById('quote').innerText = `"${quotes[Math.floor(Math.random()*quotes.length)]}"`;
-
-        // 5. CLOCK
+        // --- 4. CLOCK, QUOTE, WEATHER ---
         setInterval(() => {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            document.getElementById('date').innerText = now.toLocaleDateString([], {weekday: 'long', month: 'long', day: 'numeric'});
+            document.getElementById('date-string').innerText = now.toLocaleDateString('en-US', {weekday: 'long', month: 'long', day: 'numeric'});
         }, 1000);
+
+        const quotes = ["Home is where our story begins.", "Family: where life begins and love never ends.", "Focus on the good.", "Happiness is homemade."];
+        document.getElementById('quote-display').innerText = `"${quotes[Math.floor(Math.random()*quotes.length)]}"`;
+
+        async function fetchWeather() {
+            // Placeholder: Replace with OpenWeather fetch using your city 'Evesham'
+            document.getElementById('temp').innerText = "18°C";
+        }
+        fetchWeather();
     </script>
 </body>
 </html>
