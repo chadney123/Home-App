@@ -20,7 +20,8 @@
         
         /* Navigation */
         .tab-content { flex-grow: 1; display: none; height: 100%; overflow-y: auto; padding-bottom: 100px; }
-        .tab-content.active { display: block; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* --- HOME SCREEN TILES --- */
         .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; box-sizing: border-box; }
@@ -31,18 +32,21 @@
         .tile h3 { margin: 0 0 12px 0; color: var(--dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 
         /* --- HOME CALENDAR STRIP (DAY VIEW) --- */
-        .home-calendar-strip { grid-column: 1 / span 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
-        .person-day { background: #0a0a0a; border-radius: 15px; padding: 15px; border-top: 4px solid var(--c); min-height: 80px; }
+        .home-calendar-strip { grid-column: 1 / span 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 5px; }
+        .person-day { background: #0a0a0a; border-radius: 15px; padding: 15px; border-top: 4px solid var(--c); min-height: 70px; }
         .person-day h4 { margin: 0 0 8px 0; font-size: 0.9rem; }
 
-        /* --- BETTER BUTTONS --- */
+        /* --- UI ELEMENTS --- */
         .add-btn-round { 
             background: var(--grad); color: white; border: none; border-radius: 50%; 
             width: 45px; height: 45px; font-size: 1.5rem; font-weight: bold; 
             cursor: pointer; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
             display: flex; align-items: center; justify-content: center;
         }
-        .add-btn-round:active { transform: scale(0.9); }
+        .edit-btn { background: #333; color: #fff; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 0.9rem; }
+        
+        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: #1a1a1a; margin-bottom: 8px; border-radius: 16px; border: 1px solid #222;}
+        .note-card { background: #1a1a1a; padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
 
         /* --- SCREENSAVER --- */
         #screensaver {
@@ -52,14 +56,12 @@
         }
         #screensaver h1 { font-size: 8rem; opacity: 0.5; font-weight: 300; }
 
-        /* Lists & Notes */
-        .list-item { display: flex; align-items: center; padding: 14px; background: #1a1a1a; margin-bottom: 8px; border-radius: 16px; }
-        .note-card { background: #1a1a1a; padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid #333; }
-
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; }
-        .nav-item { color: var(--dim); text-align: center; cursor: pointer; flex: 1; }
+        /* --- BOTTOM NAV (Now 6 items) --- */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 85px; background: #050505; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; }
+        .nav-item { color: var(--dim); text-align: center; cursor: pointer; flex: 1; display: flex; flex-direction: column; align-items: center; }
         .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 1.6rem; display: block; margin-bottom: 2px; }
+        .nav-icon { font-size: 1.6rem; margin-bottom: 4px; }
+        .nav-text { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
 <body onmousemove="resetTimer()" onclick="resetTimer()" ontouchstart="resetTimer()">
@@ -67,68 +69,99 @@
     <!-- SCREENSAVER -->
     <div id="screensaver" onclick="hideScreensaver()"><h1 id="ss-clock">00:00</h1></div>
 
-    <!-- HOME TAB -->
+    <!-- 1. HOME TAB -->
     <div id="home" class="tab-content active">
         <div class="home-grid">
+            <!-- Header -->
             <div class="header-tile">
                 <div class="clock-tile"><h1 id="clock">00:00</h1><p id="date-string">...</p></div>
                 <div style="text-align: right;"><div id="temp" style="font-size: 2.5rem; font-weight: 700;">18°C</div><div style="color:var(--dim)">Evesham, UK</div></div>
             </div>
 
+            <!-- Dashboard Widgets -->
             <div class="tile">
                 <h3>🍲 Dinner</h3>
-                <div id="home-dinner" style="font-size: 1.5rem; font-weight: 600;">...</div>
+                <div id="home-dinner" style="font-size: 1.5rem; font-weight: 600; color: #fff;">Loading...</div>
             </div>
 
             <div class="tile">
                 <h3>✅ Tasks</h3>
-                <div id="home-tasks-preview" style="font-size: 1.1rem;">No tasks</div>
+                <div id="home-tasks-preview" style="font-size: 1.1rem; font-weight: 500;">No tasks</div>
             </div>
 
-            <div class="tile" style="grid-column: 1 / span 2;">
-                <h3>📝 Latest Note</h3>
-                <div id="home-note-preview" style="font-size: 1rem; color: #ccc;">No notes yet.</div>
+            <div class="tile" style="grid-column: 1 / span 2; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h3>📝 Latest Note</h3>
+                    <div id="home-note-preview" style="font-size: 1rem; color: #ccc;">No notes yet.</div>
+                </div>
             </div>
 
-            <!-- DAY VIEW FOR EVERYONE -->
+            <!-- Quote of the Day (Restored) -->
+            <div class="tile" style="grid-column: 1 / span 2; text-align: center; padding: 15px;">
+                <span id="quote-display" style="font-style: italic; color: #aaa; font-size: 1.1rem;">"Family is everything."</span>
+            </div>
+
+            <!-- Today at a Glance -->
             <div class="home-calendar-strip">
-                <div class="person-day" style="--c:var(--mom)"><h4>Mom</h4><div id="cal-mom">Free</div></div>
-                <div class="person-day" style="--c:var(--dad)"><h4>Dad</h4><div id="cal-dad">Free</div></div>
-                <div class="person-day" style="--c:var(--kid1)"><h4>Alex</h4><div id="cal-kid1">Free</div></div>
-                <div class="person-day" style="--c:var(--kid2)"><h4>Maya</h4><div id="cal-kid2">Free</div></div>
+                <div class="person-day" style="--c:var(--mom)"><h4>Mom</h4><div style="color:var(--dim); font-size:0.85rem;">Free</div></div>
+                <div class="person-day" style="--c:var(--dad)"><h4>Dad</h4><div style="color:var(--dim); font-size:0.85rem;">Free</div></div>
+                <div class="person-day" style="--c:var(--kid1)"><h4>Alex</h4><div style="color:var(--dim); font-size:0.85rem;">Free</div></div>
+                <div class="person-day" style="--c:var(--kid2)"><h4>Maya</h4><div style="color:var(--dim); font-size:0.85rem;">Free</div></div>
             </div>
         </div>
     </div>
 
-    <!-- CALENDAR, MEALS, TASKS, NOTES TABS (Simplified for example) -->
-    <div id="calendar" class="tab-content"><div style="padding:40px;"><h2>Calendar View</h2><div id="full-calendar"></div></div></div>
-    <div id="meals" class="tab-content"><div style="padding:20px;"><h2>Meals</h2><div id="meal-list"></div></div></div>
-    
+    <!-- 2. CALENDAR TAB -->
+    <div id="calendar" class="tab-content">
+        <div style="padding:20px; display:flex; justify-content:center; align-items:center; height:100%; color:var(--dim);">
+            <h2>Calendar View (Google Sync Placeholder)</h2>
+        </div>
+    </div>
+
+    <!-- 3. MEALS TAB -->
+    <div id="meals" class="tab-content">
+        <div style="padding:20px;">
+            <h2>Weekly Meal Plan</h2>
+            <div id="meal-list"></div>
+        </div>
+    </div>
+
+    <!-- 4. TASKS TAB -->
     <div id="tasks" class="tab-content">
         <div style="padding:20px; display:flex; justify-content:space-between; align-items:center;">
-            <h2>Daily Tasks</h2>
-            <button class="add-btn-round" onclick="addTask()">+</button>
+            <h2>Daily Tasks</h2><button class="add-btn-round" onclick="addTask()">+</button>
         </div>
         <div id="task-list" style="padding:0 20px;"></div>
     </div>
 
+    <!-- 5. GROCERIES TAB (NEW) -->
+    <div id="groceries" class="tab-content">
+        <div style="padding:20px; display:flex; justify-content:space-between; align-items:center;">
+            <h2>Shopping List</h2><button class="add-btn-round" onclick="addGrocery()">+</button>
+        </div>
+        <div id="grocery-list" style="padding:0 20px;"></div>
+    </div>
+
+    <!-- 6. NOTES TAB -->
     <div id="notes" class="tab-content">
         <div style="padding:20px; display:flex; justify-content:space-between; align-items:center;">
-            <h2>Family Notes</h2>
-            <button class="add-btn-round" onclick="addNote()">+</button>
+            <h2>Family Notes</h2><button class="add-btn-round" onclick="addNote()">+</button>
         </div>
         <div id="note-list" style="padding:0 20px;"></div>
     </div>
 
+    <!-- BOTTOM NAVIGATION -->
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span>Home</div>
-        <div class="nav-item" onclick="switchTab('calendar', this)"><span class="nav-icon">📅</span>Calendar</div>
-        <div class="nav-item" onclick="switchTab('meals', this)"><span class="nav-icon">🍲</span>Meals</div>
-        <div class="nav-item" onclick="switchTab('tasks', this)"><span class="nav-icon">✅</span>Tasks</div>
-        <div class="nav-item" onclick="switchTab('notes', this)"><span class="nav-icon">📝</span>Notes</div>
+        <div class="nav-item active" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></div>
+        <div class="nav-item" onclick="switchTab('calendar', this)"><span class="nav-icon">📅</span><span class="nav-text">Calendar</span></div>
+        <div class="nav-item" onclick="switchTab('meals', this)"><span class="nav-icon">🍲</span><span class="nav-text">Meals</span></div>
+        <div class="nav-item" onclick="switchTab('tasks', this)"><span class="nav-icon">✅</span><span class="nav-text">Tasks</span></div>
+        <div class="nav-item" onclick="switchTab('groceries', this)"><span class="nav-icon">🛒</span><span class="nav-text">Groceries</span></div>
+        <div class="nav-item" onclick="switchTab('notes', this)"><span class="nav-icon">📝</span><span class="nav-text">Notes</span></div>
     </nav>
 
     <script>
+        // --- 1. FIREBASE SETUP ---
         const firebaseConfig = {
             apiKey: "AIzaSyCBb3Uu--Sr21o65TUddUBIPfLfQwZsV_o",
             authDomain: "familyhub-fb842.firebaseapp.com",
@@ -141,7 +174,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 1. SCREENSAVER LOGIC (2 Minutes)
+        // --- 2. SCREENSAVER LOGIC ---
         let idleTime = 0;
         function resetTimer() { idleTime = 0; hideScreensaver(); }
         setInterval(() => {
@@ -150,32 +183,71 @@
         }, 1000);
         function hideScreensaver() { document.getElementById('screensaver').style.display = 'none'; }
 
-        // 2. NOTES LOGIC (FIXED)
-        function addNote() {
-            const text = prompt("Write your note:");
-            if (text) db.ref('notes').push({ text, time: new Date().toLocaleTimeString() });
-        }
-        db.ref('notes').on('value', (snap) => {
-            const list = document.getElementById('note-list');
-            const preview = document.getElementById('home-note-preview');
+        // --- 3. QUOTE OF THE DAY ---
+        const quotes = ["Home is where our story begins.", "Family: where life begins and love never ends.", "Focus on the good.", "Happiness is homemade.", "Choose kindness today."];
+        document.getElementById('quote-display').innerText = `"${quotes[Math.floor(Math.random()*quotes.length)]}"`;
+
+        // --- 4. MEALS LOGIC (WITH EDIT BUTTONS) ---
+        const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        
+        window.editMeal = function(day, currentMeal) {
+            const m = prompt(`What's for dinner on ${day}?`, currentMeal);
+            if (m !== null) db.ref('meals/' + day).set(m);
+        };
+
+        db.ref('meals').on('value', (snap) => {
+            const meals = snap.val() || {};
+            const list = document.getElementById('meal-list');
             list.innerHTML = '';
-            const data = snap.val();
-            let lastNote = "";
-            for (let id in data) {
-                lastNote = data[id].text;
-                const card = document.createElement('div');
-                card.className = 'note-card';
-                card.innerHTML = `<div>${data[id].text}</div><div style="font-size:0.7rem; color:var(--dim); margin-top:5px;">${data[id].time}</div>`;
-                list.prepend(card);
-            }
-            preview.innerText = lastNote || "No notes yet.";
+            
+            weekdays.forEach(day => {
+                const currentMeal = meals[day] || "Tap edit to set...";
+                const row = document.createElement('div');
+                row.className = 'list-item';
+                row.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:15px; width:100%;">
+                        <span style="font-weight:bold; color:var(--accent); width:100px;">${day}</span>
+                        <span style="flex-grow:1; color:${meals[day] ? '#fff' : '#666'};">${currentMeal}</span>
+                        <button class="edit-btn" onclick="editMeal('${day}', '${meals[day] || ''}')">✎ Edit</button>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+
+            // Update Home Screen (Today's Dinner)
+            const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+            document.getElementById('home-dinner').innerText = meals[todayName] || "No meal set";
         });
 
-        // 3. TASKS LOGIC (FIXED HOME SYNC)
-        function addTask() {
+        // --- 5. GROCERIES LOGIC (NEW) ---
+        window.addGrocery = function() {
+            const item = prompt("Add to shopping list:");
+            if (item) db.ref('groceries').push({ text: item, done: false });
+        };
+        db.ref('groceries').on('value', (snap) => {
+            const list = document.getElementById('grocery-list');
+            list.innerHTML = '';
+            const data = snap.val();
+            for (let id in data) {
+                const row = document.createElement('div');
+                row.className = 'list-item';
+                row.style.opacity = data[id].done ? '0.3' : '1';
+                row.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="firebase.database().ref('groceries/${id}').update({done: ${!data[id].done}})">
+                        <span style="font-size:1.3rem;">${data[id].done ? '✅' : '🛒'}</span>
+                        <span style="text-decoration: ${data[id].done ? 'line-through' : 'none'};">${data[id].text}</span>
+                    </div>
+                    <button class="edit-btn" style="background:#e74c3c; padding:6px 10px;" onclick="firebase.database().ref('groceries/${id}').remove()">X</button>
+                `;
+                list.appendChild(row);
+            }
+        });
+
+        // --- 6. TASKS LOGIC ---
+        window.addTask = function() {
             const t = prompt("New Task:");
             if(t) db.ref('tasks').push({ text: t, done: false });
-        }
+        };
         db.ref('tasks').on('value', (snap) => {
             const list = document.getElementById('task-list');
             const homePrev = document.getElementById('home-tasks-preview');
@@ -191,23 +263,37 @@
                 row.innerHTML = `<span>${data[id].done ? '✅' : '⭕️'} ${data[id].text}</span>`;
                 list.appendChild(row);
             }
-            homePrev.innerText = count > 0 ? `${count} items left to do` : "All caught up!";
+            homePrev.innerText = count > 0 ? `${count} remaining to do` : "All caught up!";
         });
 
-        // 4. MEAL SYNC
-        db.ref('meals').on('value', (snap) => {
-            const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-            const meal = snap.val() ? snap.val()[today] : "No meal set";
-            document.getElementById('home-dinner').innerText = meal || "No meal set";
+        // --- 7. NOTES LOGIC ---
+        window.addNote = function() {
+            const text = prompt("Write your note:");
+            if (text) db.ref('notes').push({ text, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) });
+        };
+        db.ref('notes').on('value', (snap) => {
+            const list = document.getElementById('note-list');
+            const preview = document.getElementById('home-note-preview');
+            list.innerHTML = '';
+            const data = snap.val();
+            let lastNote = "";
+            for (let id in data) {
+                lastNote = data[id].text;
+                const card = document.createElement('div');
+                card.className = 'note-card';
+                card.innerHTML = `<div>${data[id].text}</div><div style="font-size:0.75rem; color:var(--dim); margin-top:8px;">${data[id].time}</div>`;
+                list.prepend(card); // Puts newest at top
+            }
+            preview.innerText = lastNote || "No notes yet.";
         });
 
-        // 5. CORE UI
-        function switchTab(id, el) {
+        // --- 8. SYSTEM (TAB SWITCHER & CLOCK) ---
+        window.switchTab = function(id, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
-        }
+        };
 
         setInterval(() => {
             const now = new Date();
