@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
-    <title>Family Hub Pro V18</title>
+    <title>Family Hub Pro V19</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -18,17 +18,15 @@
         }
         body.light-mode { --bg: #f5f5f7; --card: #ffffff; --text: #1d1d1f; --dim: #86868b; --nav-bg: #ffffff; }
 
-        /* AUTO ASPECT RATIO ENGINE */
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.5s; }
         
         #brightness-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10001; background: black; opacity: 0; transition: opacity 2s; }
         
-        .tab-content { flex: 1; display: none; overflow: hidden; padding-bottom: 90px; height: 100%; }
+        .tab-content { flex: 1; display: none; overflow: hidden; padding-bottom: 90px; height: 100%; width: 100%; }
         .tab-content.active { display: flex; flex-direction: column; }
 
-        /* FLEXIBLE GRID */
+        /* HOME GRID */
         .home-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr 1fr auto; gap: 12px; padding: 15px; flex: 1; box-sizing: border-box; }
-        
         .header-tile { grid-column: 1 / span 2; display: flex; justify-content: space-between; align-items: flex-start; }
         .clock-tile h1 { font-size: clamp(4rem, 12vh, 6.5rem); margin: 0; font-weight: 700; letter-spacing: -4px; line-height: 0.85; }
         .date-text { font-size: clamp(0.9rem, 2vh, 1.3rem); margin-top: 5px; color: var(--dim); font-weight: 500; }
@@ -36,7 +34,6 @@
         .tile { background: var(--card); border-radius: 20px; padding: 15px; border: 1px solid rgba(128,128,128,0.1); display: flex; flex-direction: column; justify-content: center; }
         .tile h3 { margin: 0 0 8px 0; font-size: 0.85rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
         
-        /* WEATHER STACK */
         .weather-container { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
         .weather-main { font-size: clamp(2rem, 5vh, 3rem); font-weight: 700; display: flex; align-items: center; gap: 8px; }
         .weather-forecast { display: flex; gap: 12px; margin-top: 10px; border-top: 1px solid rgba(128,128,128,0.1); padding-top: 8px; }
@@ -47,19 +44,30 @@
         .person-day h4 { margin: 0 0 5px 0; font-size: 0.9rem; }
         .mini-event { font-size: 0.75rem; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+        /* LISTS & BUTTONS */
+        .list-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .list-container { overflow-y: auto; padding: 0 20px; flex: 1; }
+        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--card); margin-bottom: 10px; border-radius: 15px; border: 1px solid rgba(128,128,128,0.1); font-size: 1.1rem; }
+        .add-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+
+        /* CALENDAR */
+        .calendar-legend { display: flex; justify-content: center; gap: 15px; padding: 10px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.8rem; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 10px; flex: 1; }
+        .day-col { background: var(--card); border-radius: 12px; border: 1px solid rgba(128,128,128,0.1); overflow: hidden; }
+        .day-header { text-align: center; padding: 10px 2px; border-bottom: 1px solid rgba(128,128,128,0.1); background: rgba(255,255,255,0.03); }
+        .cal-event { background: rgba(128,128,128,0.1); border-left: 3px solid var(--c); padding: 5px; border-radius: 4px; font-size: 0.7rem; margin: 4px; }
+
         /* NAV */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(128,128,128,0.1); z-index: 100; }
-        .nav-item { color: var(--dim); text-align: center; flex: 1; padding: 5px 0; cursor: pointer; }
+        .nav-item { color: var(--dim); text-align: center; flex: 1; cursor: pointer; }
         .nav-icon { font-size: 1.8rem; display: block; }
         .nav-label { font-size: 0.65rem; font-weight: 700; margin-top: 2px; }
         .nav-item.active { color: var(--accent); }
 
         #screensaver { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; background: black; color: white; text-align: center; }
         #ss-clock { font-size: 10rem; font-weight: 700; margin: 0; }
-
-        /* LIST SCROLLING FIX */
-        .list-container { overflow-y: auto; padding: 0 20px; flex: 1; }
-        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--card); margin-bottom: 8px; border-radius: 12px; border: 1px solid rgba(128,128,128,0.1); font-size: 1rem; }
     </style>
 </head>
 <body onmousemove="resetTimer()" onclick="resetTimer()" ontouchstart="resetTimer()">
@@ -79,10 +87,7 @@
     <div id="home" class="tab-content active">
         <div class="home-grid">
             <div class="header-tile">
-                <div class="clock-tile">
-                    <h1 id="clock">00:00</h1>
-                    <p id="date-string" class="date-text">...</p>
-                </div>
+                <div class="clock-tile"><h1 id="clock">00:00</h1><p id="date-string" class="date-text">...</p></div>
                 <div class="weather-container">
                     <div class="weather-main"><span id="w-icon">☀️</span> <span id="temp">--°</span></div>
                     <div style="color:var(--accent); font-weight: 700; font-size: 1rem;">Worcester</div>
@@ -94,11 +99,11 @@
             <div class="tile"><h3>🍲 Dinner</h3><div id="home-dinner" style="font-size: clamp(1.1rem, 3vh, 1.5rem); color: var(--accent); font-weight: 700;">...</div></div>
             <div class="tile">
                 <h3>✨ Motivation</h3>
-                <div id="daily-quote" style="font-style: italic; color: var(--accent); margin-bottom: 5px; font-size: 0.9rem; line-height: 1.2;">"Keep going, you're doing great!"</div>
+                <div id="daily-quote" style="font-style: italic; color: var(--accent); margin-bottom: 5px; font-size: 0.9rem; line-height: 1.2;">"One step at a time."</div>
                 <div id="daily-joke" style="font-size: 0.8rem; border-top: 1px solid rgba(128,128,128,0.1); padding-top:5px; color: var(--dim);">...</div>
             </div>
             
-            <div class="tile" style="grid-column: 1 / span 2;"><h3>📝 Latest Note</h3><div id="home-note-preview" style="font-size: 1rem;">...</div></div>
+            <div class="tile" style="grid-column: 1 / span 2;"><h3>📝 Latest Note</h3><div id="home-note-preview" style="font-size: 1.1rem;">...</div></div>
             
             <div class="home-calendar-strip">
                 <div class="person-day" style="--c:var(--Michelle)"><h4>Michelle</h4><div id="day-Michelle"></div></div>
@@ -111,16 +116,23 @@
 
     <!-- TABS -->
     <div id="calendar" class="tab-content">
-        <div id="week-grid-container" style="flex:1; overflow:auto;"></div>
+        <div class="calendar-legend">
+            <div class="legend-item"><div class="dot" style="background:var(--Michelle)"></div>Michelle</div>
+            <div class="legend-item"><div class="dot" style="background:var(--Paul)"></div>Paul</div>
+            <div class="legend-item"><div class="dot" style="background:var(--Ella)"></div>Ella</div>
+            <div class="legend-item"><div class="dot" style="background:var(--Ivy)"></div>Ivy</div>
+        </div>
+        <div id="week-grid-container" style="flex:1;"></div>
     </div>
-    <div id="meals" class="tab-content"><div class="list-container"><h2>Meals</h2><div id="meal-list"></div></div></div>
-    <div id="tasks" class="tab-content"><div class="list-container"><h2>Tasks</h2><button onclick="addTask()">+ New</button><div id="task-list"></div></div></div>
-    <div id="groceries" class="tab-content"><div class="list-container"><h2>Shopping</h2><button onclick="addGrocery()">+ Add</button><div id="grocery-list"></div></div></div>
-    <div id="notes" class="tab-content"><div class="list-container"><h2>Notes</h2><button onclick="addNote()">+ Add</button><div id="note-list"></div></div></div>
+
+    <div id="meals" class="tab-content"><div class="list-header"><h2>Meal Planner</h2></div><div id="meal-list" class="list-container"></div></div>
+    <div id="tasks" class="tab-content"><div class="list-header"><h2>Family Tasks</h2><button class="add-btn" onclick="addTask()">+ New</button></div><div id="task-list" class="list-container"></div></div>
+    <div id="groceries" class="tab-content"><div class="list-header"><h2>Shopping List</h2><button class="add-btn" onclick="addGrocery()">+ Add</button></div><div id="grocery-list" class="list-container"></div></div>
+    <div id="notes" class="tab-content"><div class="list-header"><h2>Notes</h2><button class="add-btn" onclick="addNote()">+ Add</button></div><div id="note-list" class="list-container"></div></div>
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span class="nav-label">HOME</span></div>
-        <div class="nav-item" onclick="switchTab('calendar', this)"><span class="nav-icon">📅</span><span class="nav-label">CAL</span></div>
+        <div class="nav-item" onclick="switchTab('calendar', this)"><span class="nav-icon">📅</span><span class="nav-label">CALENDAR</span></div>
         <div class="nav-item" onclick="switchTab('meals', this)"><span class="nav-icon">🍲</span><span class="nav-label">MEALS</span></div>
         <div class="nav-item" onclick="switchTab('tasks', this)"><span class="nav-icon">✅</span><span class="nav-label">TASKS</span></div>
         <div class="nav-item" onclick="switchTab('groceries', this)"><span class="nav-icon">🛒</span><span class="nav-label">SHOP</span></div>
@@ -157,26 +169,46 @@
             } catch(e) {}
         }
 
-        // UPDATED FUN: KID JOKES & LIFE MOTIVATION
+        // FUN
         async function fetchFun() {
             try {
-                // Fetch Pun or Misc joke with strict safe mode (avoiding 'Any' which includes tech)
                 const jRes = await fetch('https://v2.jokeapi.dev/joke/Pun,Misc?blacklistFlags=nsfw,religious,political,racist,sexist,explicit&safe-mode&type=single');
                 const jData = await jRes.json();
                 document.getElementById('daily-joke').innerText = jData.joke || "What do you call a fake noodle? An impasta!";
-                
-                // Fetch motivational life quotes
                 const qRes = await fetch('https://type.fit/api/quotes');
                 const qData = await qRes.json();
                 const randomQ = qData[Math.floor(Math.random() * qData.length)];
                 document.getElementById('daily-quote').innerText = `"${randomQ.text}"`;
-            } catch(e) { console.log("Fun error"); }
+            } catch(e) {}
         }
 
-        // CALENDAR
+        // CALENDAR LOGIC
         async function fetchEvents(name) {
             const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(FAMILY_CALENDARS[name])}/events?key=${GOOGLE_API_KEY}&timeMin=${new Date().toISOString()}&singleEvents=true&orderBy=startTime&maxResults=5`;
             const res = await fetch(url); const data = await res.json(); return data.items || [];
+        }
+
+        async function buildWeeklyCalendar() {
+            const container = document.getElementById('week-grid-container');
+            container.innerHTML = '<p style="text-align:center; padding:50px;">Syncing...</p>';
+            let allEvs = [];
+            for (const name in FAMILY_CALENDARS) {
+                const evs = await fetchEvents(name);
+                evs.forEach(e => {
+                    let d = new Date(e.start.dateTime || e.start.date);
+                    allEvs.push({ ...e, person: name, key: d.toDateString() });
+                });
+            }
+            const days = []; for(let i=0; i<7; i++) { let d = new Date(); d.setDate(d.getDate()+i); days.push(d); }
+            let html = '<div class="week-grid">';
+            days.forEach(day => {
+                html += `<div class="day-col"><div class="day-header"><small>${day.toLocaleDateString('en-GB',{weekday:'short'})}</small><br><b>${day.getDate()}</b></div>`;
+                allEvs.filter(e => e.key === day.toDateString()).forEach(e => {
+                    html += `<div class="cal-event" style="--c:var(--${e.person})">${e.summary}</div>`;
+                });
+                html += '</div>';
+            });
+            container.innerHTML = html + '</div>';
         }
 
         async function updateAgendas() {
@@ -191,7 +223,49 @@
             }
         }
 
-        // SYSTEM CLOCK
+        // ADD FUNCTIONS
+        window.addTask = () => { const t = prompt("New Task:"); if(t) db.ref('tasks').push({ text: t, done: false }); };
+        window.addGrocery = () => { const t = prompt("Add to Shop:"); if(t) db.ref('groceries').push({ text: t, done: false }); };
+        window.addNote = () => { const t = prompt("New Note:"); if(t) db.ref('notes').push({ text: t }); };
+
+        // FIREBASE SYNC
+        db.ref('tasks').on('value', snap => {
+            const list = document.getElementById('task-list'); list.innerHTML = '';
+            const data = snap.val();
+            for(let id in data) list.innerHTML += `<div class="list-item"><span style="text-decoration:${data[id].done?'line-through':''}" onclick="db.ref('tasks/${id}').update({done:${!data[id].done}})">${data[id].text}</span><button style="background:none; border:none; color:red;" onclick="db.ref('tasks/${id}').remove()">✕</button></div>`;
+        });
+        db.ref('groceries').on('value', snap => {
+            const list = document.getElementById('grocery-list'); list.innerHTML = '';
+            const data = snap.val();
+            for(let id in data) list.innerHTML += `<div class="list-item"><span style="text-decoration:${data[id].done?'line-through':''}" onclick="db.ref('groceries/${id}').update({done:${!data[id].done}})">${data[id].text}</span><button style="background:none; border:none; color:red;" onclick="db.ref('groceries/${id}').remove()">✕</button></div>`;
+        });
+        db.ref('notes').on('value', snap => {
+            const list = document.getElementById('note-list'); list.innerHTML = '';
+            const data = snap.val(); let last = "No notes";
+            if(data) {
+                Object.keys(data).reverse().forEach(id => {
+                    last = data[id].text;
+                    list.innerHTML += `<div class="list-item"><span>${data[id].text}</span><button style="background:none; border:none; color:red;" onclick="db.ref('notes/${id}').remove()">✕</button></div>`;
+                });
+            }
+            document.getElementById('home-note-preview').innerText = last;
+        });
+        db.ref('meals').on('value', snap => {
+            const m = snap.val() || {}; const list = document.getElementById('meal-list'); list.innerHTML = '';
+            ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day => {
+                list.innerHTML += `<div class="list-item"><div><b>${day}</b><br><small>${m[day] || '---'}</small></div><button class="add-btn" onclick="const n=prompt('Dinner?'); if(n)db.ref('meals/${day}').set(n)">Edit</button></div>`;
+            });
+            document.getElementById('home-dinner').innerText = m[new Date().toLocaleDateString('en-US',{weekday:'long'})] || "Not Set";
+        });
+
+        // SYSTEM
+        window.switchTab = (id, el) => {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active'); el.classList.add('active');
+            if(id === 'calendar') buildWeeklyCalendar();
+        };
+
         setInterval(() => {
             const n = new Date();
             document.getElementById('clock').innerText = n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
@@ -200,39 +274,13 @@
             if (h >= 7 && h < 19) document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode');
         }, 1000);
 
-        // INITIAL LOAD & REFRESH
-        fetchWeather(); updateAgendas(); fetchFun();
-        setInterval(() => { updateAgendas(); fetchWeather(); fetchFun(); }, 600000);
-
         let idle = 0;
         function resetTimer() { idle = 0; document.getElementById('screensaver').style.display = 'none'; }
         setInterval(() => { idle++; if(idle >= 30) document.getElementById('screensaver').style.display = 'flex'; }, 10000);
 
-        window.switchTab = (id, el) => {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.add('active'); el.classList.add('active');
-        };
-
-        // FIREBASE SYNC
-        db.ref('notes').on('value', snap => {
-            const list = document.getElementById('note-list'); list.innerHTML = '';
-            const data = snap.val(); let last = "No notes";
-            if(data) {
-                Object.keys(data).reverse().forEach(id => {
-                    last = data[id].text;
-                    list.innerHTML += `<div class="list-item"><span>${data[id].text}</span><button onclick="db.ref('notes/${id}').remove()">✕</button></div>`;
-                });
-            }
-            document.getElementById('home-note-preview').innerText = last;
-        });
-        db.ref('meals').on('value', snap => {
-            const m = snap.val() || {}; const list = document.getElementById('meal-list'); list.innerHTML = '';
-            ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day => {
-                list.innerHTML += `<div class="list-item"><b>${day}</b>: ${m[day] || '---'}<button onclick="const n=prompt('Dinner?'); if(n)db.ref('meals/${day}').set(n)">Edit</button></div>`;
-            });
-            document.getElementById('home-dinner').innerText = m[new Date().toLocaleDateString('en-US',{weekday:'long'})] || "Not Set";
-        });
+        // INITIAL LOAD
+        fetchWeather(); updateAgendas(); fetchFun();
+        setInterval(() => { updateAgendas(); fetchWeather(); fetchFun(); }, 600000);
     </script>
 </body>
 </html>
