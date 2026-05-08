@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
-    <title>Family Hub Pro V24</title>
+    <title>Family Hub Pro V25</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -18,36 +18,20 @@
         }
         body.light-mode { --bg: #f5f5f7; --card: #ffffff; --text: #1d1d1f; --dim: #86868b; --nav-bg: #ffffff; }
 
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.5s; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.5s; }
         
         #brightness-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10001; background: black; opacity: 0; transition: opacity 2s; }
         
-        .tab-content { flex: 1; display: none; overflow: hidden; padding-bottom: 90px; height: 100%; width: 100%; }
-        .tab-content.active { display: flex; flex-direction: column; }
+        .tab-content { flex: 1; display: none; overflow: hidden; padding-bottom: 90px; height: 100%; width: 100%; flex-direction: column; }
+        .tab-content.active { display: flex; }
 
-        .home-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            grid-template-rows: auto auto auto 1fr; 
-            gap: 12px; 
-            padding: 15px; 
-            flex: 1; 
-            box-sizing: border-box; 
-        }
-        
+        /* HOME GRID */
+        .home-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto auto 1fr; gap: 12px; padding: 15px; flex: 1; box-sizing: border-box; }
         .header-tile { grid-column: 1 / span 2; display: flex; justify-content: space-between; align-items: flex-start; }
         .clock-tile h1 { font-size: clamp(4rem, 12vh, 6.5rem); margin: 0; font-weight: 700; letter-spacing: -4px; line-height: 0.85; }
         .date-text { font-size: clamp(0.9rem, 2vh, 1.3rem); margin-top: 5px; color: var(--dim); font-weight: 500; }
         
-        .tile { 
-            background: var(--card); 
-            border-radius: 20px; 
-            padding: 10px 15px; 
-            border: 1px solid rgba(128,128,128,0.1); 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-        }
+        .tile { background: var(--card); border-radius: 20px; padding: 10px 15px; border: 1px solid rgba(128,128,128,0.1); display: flex; flex-direction: column; justify-content: center; }
         .tile h3 { margin: 0 0 4px 0; font-size: 0.75rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
         
         .weather-container { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
@@ -56,53 +40,37 @@
         .forecast-day { text-align: center; font-size: 0.75rem; color: var(--dim); min-width: 40px; }
 
         .home-calendar-strip { grid-column: 1 / span 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; height: 100%; }
-        .person-day { 
-            background: var(--card); 
-            border-radius: 15px; 
-            padding: 12px; 
-            border-top: 6px solid var(--c); 
-            height: 100%; 
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+        .person-day { background: var(--card); border-radius: 15px; padding: 12px; border-top: 6px solid var(--c); height: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; }
         .person-day h4 { margin: 0 0 2px 0; font-size: 1rem; font-weight: 700; }
         
-        .mini-event { 
-            background: var(--c); 
-            color: #fff; 
-            font-size: 0.95rem; 
-            padding: 8px 10px; 
-            border-radius: 10px; 
-            font-weight: 600;
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+        .mini-event { background: var(--c); color: #fff; font-size: 0.95rem; padding: 8px 10px; border-radius: 10px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-        .list-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .list-container { overflow-y: auto; padding: 0 20px; flex: 1; }
-        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--card); margin-bottom: 10px; border-radius: 15px; border: 1px solid rgba(128,128,128,0.1); font-size: 1.1rem; }
-        .add-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; font-size: 1rem; cursor: pointer; }
-
-        .calendar-legend { display: flex; justify-content: center; gap: 30px; padding: 20px; border-bottom: 1px solid rgba(128,128,128,0.1); flex-wrap: wrap; }
-        .legend-item { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.2rem; }
-        .dot { width: 16px; height: 16px; border-radius: 50%; }
+        /* CALENDAR TAB STYLES */
+        .calendar-legend { display: flex; justify-content: center; gap: 20px; padding: 15px; border-bottom: 1px solid rgba(128,128,128,0.1); flex-wrap: wrap; background: var(--card); }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.1rem; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; }
         
-        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 10px; }
-        .day-col { background: var(--card); border-radius: 12px; border: 1px solid rgba(128,128,128,0.1); overflow: hidden; display: flex; flex-direction: column; min-height: 80px; }
-        .day-header { text-align: center; padding: 5px 2px; border-bottom: 1px solid rgba(128,128,128,0.1); background: rgba(255,255,255,0.03); font-size: 0.9rem; }
-        .cal-event { background: var(--c); color: #fff; padding: 4px 6px; border-radius: 6px; font-size: 0.75rem; margin: 2px; font-weight: 600; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; }
+        .cal-nav { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--bg); }
+        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; padding: 10px; flex: 1; overflow-y: auto; align-content: start; }
+        .day-label { text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--dim); padding-bottom: 5px; }
+        .day-col { background: var(--card); border-radius: 8px; border: 1px solid rgba(128,128,128,0.1); display: flex; flex-direction: column; min-height: 100px; }
+        .day-header { text-align: center; padding: 4px; font-size: 0.85rem; border-bottom: 1px solid rgba(128,128,128,0.05); }
+        .cal-event { background: var(--c); color: #fff; padding: 3px 5px; border-radius: 4px; font-size: 0.7rem; margin: 2px; font-weight: 600; line-height: 1.1; overflow: hidden; }
 
+        /* CHORE CHART */
         .chore-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 15px; flex: 1; overflow-y: auto; }
         .chore-column { background: rgba(128,128,128,0.05); border-radius: 20px; padding: 15px; border: 1px solid rgba(128,128,128,0.1); display: flex; flex-direction: column; }
         .chore-column h3 { margin: 0 0 15px 0; text-align: center; color: var(--c); font-size: 1.2rem; border-bottom: 2px solid var(--c); padding-bottom: 10px; }
         .chore-item { background: var(--card); padding: 12px; border-radius: 12px; margin-bottom: 10px; font-size: 0.9rem; border-left: 4px solid var(--c); display: flex; flex-direction: column; gap: 5px; }
         .chore-item.done { opacity: 0.6; border-left-color: #2ecc71; }
         .chore-item.done span { text-decoration: line-through; }
-        .reward-badge { margin-top: auto; padding: 15px; background: rgba(255,215,0,0.1); border-radius: 15px; text-align: center; border: 1px dashed gold; color: gold; font-weight: 700; }
+        .reward-badge { margin-top: auto; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 15px; text-align: center; border: 1px dashed gold; color: gold; font-weight: 700; }
+
+        /* LISTS */
+        .list-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .list-container { overflow-y: auto; padding: 0 20px; flex: 1; }
+        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--card); margin-bottom: 10px; border-radius: 15px; border: 1px solid rgba(128,128,128,0.1); font-size: 1.1rem; }
+        .add-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; font-size: 1rem; cursor: pointer; }
 
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(128,128,128,0.1); z-index: 100; }
         .nav-item { color: var(--dim); text-align: center; flex: 1; cursor: pointer; }
@@ -139,16 +107,13 @@
                     <div class="weather-forecast" id="forecast-cont"></div>
                 </div>
             </div>
-            
             <div class="tile"><h3>🍲 Dinner</h3><div id="home-dinner" style="font-size: 1.3rem; color: var(--accent); font-weight: 700;">...</div></div>
             <div class="tile">
                 <h3>✨ Motivation</h3>
-                <div id="daily-quote" style="font-style: italic; color: var(--accent); margin-bottom: 3px; font-size: 0.85rem; line-height: 1.2;">"One step at a time."</div>
-                <div id="daily-joke" style="font-size: 0.75rem; border-top: 1px solid rgba(128,128,128,0.1); padding-top:3px; color: var(--dim);">...</div>
+                <div id="daily-quote" style="font-style: italic; color: var(--accent); font-size: 0.85rem; line-height: 1.2;">"One step at a time."</div>
+                <div id="daily-joke" style="font-size: 0.75rem; border-top: 1px solid rgba(128,128,128,0.1); padding-top:3px; color: var(--dim); margin-top:5px;">...</div>
             </div>
-            
             <div class="tile" style="grid-column: 1 / span 2;"><h3>📝 Latest Note</h3><div id="home-note-preview" style="font-size: 1.1rem;">...</div></div>
-            
             <div class="home-calendar-strip">
                 <div class="person-day" style="--c:var(--Michelle)"><h4>Michelle</h4><div id="day-Michelle"></div></div>
                 <div class="person-day" style="--c:var(--Paul)"><h4>Paul</h4><div id="day-Paul"></div></div>
@@ -166,7 +131,14 @@
             <div class="legend-item"><div class="dot" style="background:var(--Ella)"></div>Ella</div>
             <div class="legend-item"><div class="dot" style="background:var(--Ivy)"></div>Ivy</div>
         </div>
-        <div id="week-grid-container" style="flex:1; overflow-y: auto; padding-bottom: 20px;"></div>
+        <div class="cal-nav">
+            <button class="add-btn" onclick="changeMonth(-1)">&larr; Prev</button>
+            <h2 id="cal-month-title" style="margin:0;">Month</h2>
+            <button class="add-btn" onclick="changeMonth(1)">Next &rarr;</button>
+        </div>
+        <div id="month-grid-container" class="week-grid">
+            <!-- Grid injected here -->
+        </div>
     </div>
 
     <!-- CHORE TAB -->
@@ -238,39 +210,35 @@
                 url += `&maxResults=${limit || 5}`;
                 const res = await fetch(url);
                 const data = await res.json();
-                if(data.error) return [];
                 return data.items || [];
             } catch(e) { return []; }
         }
 
         async function buildMonthCalendar() {
-            const container = document.getElementById('week-grid-container');
-            container.innerHTML = '<div style="text-align:center; padding:50px;">Syncing Calendars...</div>';
+            const container = document.getElementById('month-grid-container');
+            container.innerHTML = '<div style="grid-column: 1 / span 7; text-align:center; padding:40px; color:var(--accent);">Syncing Month...</div>';
             
             const y = calDate.getFullYear();
             const m = calDate.getMonth();
             const startOfMonth = new Date(y, m, 1);
             const endOfMonth = new Date(y, m + 1, 0, 23, 59, 59);
             
+            document.getElementById('cal-month-title').innerText = startOfMonth.toLocaleDateString('en-GB',{month:'long', year:'numeric'});
+
             let allEvs = [];
-            for (const name in FAMILY_CALENDARS) {
-                const evs = await fetchEvents(name, startOfMonth.toISOString(), endOfMonth.toISOString(), 100);
-                evs.forEach(e => {
-                    let d = new Date(e.start.dateTime || e.start.date);
-                    allEvs.push({ ...e, person: name, key: d.toDateString() });
-                });
-            }
+            try {
+                for (const name in FAMILY_CALENDARS) {
+                    const evs = await fetchEvents(name, startOfMonth.toISOString(), endOfMonth.toISOString(), 100);
+                    evs.forEach(e => {
+                        let d = new Date(e.start.dateTime || e.start.date);
+                        allEvs.push({ ...e, person: name, key: d.toDateString() });
+                    });
+                }
+            } catch(e) { console.error("Cal Load Error", e); }
             
-            let html = `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:15px;">
-                <button class="add-btn" onclick="changeMonth(-1)">&larr; Prev</button>
-                <h2 style="margin:0;">${startOfMonth.toLocaleDateString('en-GB',{month:'long', year:'numeric'})}</h2>
-                <button class="add-btn" onclick="changeMonth(1)">Next &rarr;</button>
-            </div>
-            <div class="week-grid">`;
-            
+            let html = '';
             ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(d => {
-                html += `<div style="text-align:center; font-weight:bold; color:var(--dim); font-size:0.7rem;">${d}</div>`;
+                html += `<div class="day-label">${d}</div>`;
             });
             
             let firstDay = startOfMonth.getDay(); 
@@ -281,9 +249,9 @@
             for(let i=1; i<=daysInMonth; i++) {
                 let currentDay = new Date(y, m, i);
                 let isToday = currentDay.toDateString() === new Date().toDateString();
-                html += `<div class="day-col" style="${isToday ? 'border: 1px solid var(--accent);' : ''}">
+                html += `<div class="day-col" style="${isToday ? 'border: 2px solid var(--accent);' : ''}">
                     <div class="day-header" style="${isToday ? 'background: var(--accent); color: white;' : ''}">${i}</div>
-                    <div style="padding: 2px;">`;
+                    <div style="flex:1; overflow:hidden;">`;
                 
                 allEvs.filter(e => e.key === currentDay.toDateString()).forEach(e => {
                     html += `<div class="cal-event" style="--c:var(--${e.person})">${e.summary}</div>`;
@@ -291,7 +259,7 @@
                 
                 html += `</div></div>`;
             }
-            container.innerHTML = html + '</div>';
+            container.innerHTML = html;
         }
 
         window.changeMonth = (dir) => { calDate.setMonth(calDate.getMonth() + dir); buildMonthCalendar(); };
@@ -312,10 +280,10 @@
         window.addTask = () => { 
             const t = prompt("What is the chore?"); 
             if(t) {
-                const p = prompt("Assign to: (Michelle, Paul, Ella, or Ivy)");
-                if(p && ['Michelle','Paul','Ella','Ivy'].includes(p)) {
+                const p = prompt("Assign to: Michelle, Paul, Ella, or Ivy");
+                if(p && FAMILY_CALENDARS[p]) {
                     db.ref('tasks').push({ text: t, assigned: p, done: false });
-                } else { alert("Please type a valid name exactly."); }
+                } else { alert("Type a valid name (e.g. Ella)"); }
             }
         };
         
@@ -333,12 +301,12 @@
                         if(isDone) stars++;
                         colHtml += `<div class="chore-item ${isDone?'done':''}"><span>${data[id].text}</span>
                                 <div style="display:flex; gap:10px; margin-top:5px;">
-                                    <button style="flex:1; background:${isDone?'#2ecc71':'#444'}; color:white; border:none; border-radius:5px; padding:5px;" onclick="db.ref('tasks/${id}').update({done:${!isDone}})">${isDone?'Done!':'Check'}</button>
+                                    <button style="flex:1; background:${isDone?'#2ecc71':'#444'}; color:white; border:none; border-radius:5px; padding:5px;" onclick="db.ref('tasks/${id}').update({done:${!isDone}})">${isDone?'Done':'Check'}</button>
                                     <button style="background:none; border:none; color:red;" onclick="db.ref('tasks/${id}').remove()">✕</button>
                                 </div></div>`;
                     }
                 });
-                colHtml += `<div class="reward-badge">⭐ ${stars} Stars Earned</div></div>`;
+                colHtml += `<div class="reward-badge">⭐ ${stars} Stars</div></div>`;
                 container.innerHTML += colHtml;
             });
         });
@@ -369,7 +337,9 @@
         window.switchTab = (id, el) => {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.add('active'); el.classList.add('active');
+            const target = document.getElementById(id);
+            if(target) target.classList.add('active'); 
+            el.classList.add('active');
             if(id === 'calendar') { calDate = new Date(); buildMonthCalendar(); }
         };
 
