@@ -192,7 +192,6 @@
             const who = prompt("Assign to (Michelle, Paul, Ella, Ivy, or Family):", "Family");
             if(text && date) {
                 db.ref('hub_events').push({ text, date, who });
-                buildMonthCalendar();
             }
         };
 
@@ -257,7 +256,6 @@
                 });
             }
 
-            // Fetch Hub Events from Firebase
             const hubSnap = await db.ref('hub_events').once('value');
             const hubData = hubSnap.val() || {};
             Object.keys(hubData).forEach(id => {
@@ -287,6 +285,12 @@
 
         window.changeMonth = (dir) => { calDate.setMonth(calDate.getMonth() + dir); buildMonthCalendar(); };
 
+        // --- NEW REAL-TIME SYNC LOGIC ---
+        db.ref('hub_events').on('value', () => {
+            updateAgendas();
+            if(document.getElementById('calendar').classList.contains('active')) buildMonthCalendar();
+        });
+
         async function updateAgendas() {
             const today = new Date().toDateString();
             const hubSnap = await db.ref('hub_events').once('value');
@@ -298,7 +302,6 @@
                 if(!homeCont) continue;
                 homeCont.innerHTML = '';
                 
-                // Merge Google and Hub
                 let combined = evs.filter(e => new Date(e.start.dateTime || e.start.date).toDateString() === today).map(e => ({summary: e.summary}));
                 Object.values(hubData).forEach(h => {
                     if(new Date(h.date).toDateString() === today && (h.who === name || h.who === 'Family')) {
@@ -311,7 +314,14 @@
             }
         }
 
-        window.addTask = () => { 
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'visible') {
+                updateAgendas();
+                fetchWeather();
+            }
+        });
+
+        window.addTask = () => { 
             const t = prompt("What is the chore?"); if(!t) return;
             const p = prompt("Assign to: Michelle, Paul, Ella, or Ivy");
             if(p && FAMILY_CALENDARS[p]) { db.ref('tasks').push({ text: t, assigned: p, done: false }); }
@@ -380,10 +390,11 @@
         function resetTimer() { idle = 0; document.getElementById('screensaver').style.display = 'none'; }
         setInterval(() => { idle++; if(idle >= 30) document.getElementById('screensaver').style.display = 'flex'; }, 10000);
 
+        // INITIAL LOAD
         fetchWeather(); updateAgendas(); fetchFun();
         setInterval(() => { updateAgendas(); fetchWeather(); fetchFun(); }, 600000);
     </script>
-        <script>
+    <script>
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js');
       }
