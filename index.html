@@ -383,5 +383,10 @@
         fetchWeather(); updateAgendas(); fetchFun();
         setInterval(() => { updateAgendas(); fetchWeather(); fetchFun(); }, 600000);
     </script>
+        <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+      }
+    </script>
 </body>
 </html>
