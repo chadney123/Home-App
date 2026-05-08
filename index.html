@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
-    <title>Family Hub Pro V23</title>
+    <title>Family Hub Pro V24</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -87,14 +87,14 @@
         .list-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--card); margin-bottom: 10px; border-radius: 15px; border: 1px solid rgba(128,128,128,0.1); font-size: 1.1rem; }
         .add-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; font-size: 1rem; cursor: pointer; }
 
-        .calendar-legend { display: flex; justify-content: center; gap: 30px; padding: 20px; border-bottom: 1px solid rgba(128,128,128,0.1); }
-        .legend-item { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.4rem; }
-        .dot { width: 18px; height: 18px; border-radius: 50%; }
+        .calendar-legend { display: flex; justify-content: center; gap: 30px; padding: 20px; border-bottom: 1px solid rgba(128,128,128,0.1); flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.2rem; }
+        .dot { width: 16px; height: 16px; border-radius: 50%; }
         
-        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 10px; flex: 1; }
-        .day-col { background: var(--card); border-radius: 12px; border: 1px solid rgba(128,128,128,0.1); overflow: hidden; display: flex; flex-direction: column; }
-        .day-header { text-align: center; padding: 10px 2px; border-bottom: 1px solid rgba(128,128,128,0.1); background: rgba(255,255,255,0.03); }
-        .cal-event { background: var(--c); color: #fff; padding: 8px; border-radius: 8px; font-size: 0.85rem; margin: 6px 4px; font-weight: 600; line-height: 1.2; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 10px; }
+        .day-col { background: var(--card); border-radius: 12px; border: 1px solid rgba(128,128,128,0.1); overflow: hidden; display: flex; flex-direction: column; min-height: 80px; }
+        .day-header { text-align: center; padding: 5px 2px; border-bottom: 1px solid rgba(128,128,128,0.1); background: rgba(255,255,255,0.03); font-size: 0.9rem; }
+        .cal-event { background: var(--c); color: #fff; padding: 4px 6px; border-radius: 6px; font-size: 0.75rem; margin: 2px; font-weight: 600; line-height: 1.1; overflow: hidden; text-overflow: ellipsis; }
 
         .chore-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 15px; flex: 1; overflow-y: auto; }
         .chore-column { background: rgba(128,128,128,0.05); border-radius: 20px; padding: 15px; border: 1px solid rgba(128,128,128,0.1); display: flex; flex-direction: column; }
@@ -159,22 +159,20 @@
     </div>
 
     <!-- CALENDAR TAB -->
-    <div id="calendar" class="tab-content" style="display:none; flex-direction:column; height:100%;">
+    <div id="calendar" class="tab-content">
         <div class="calendar-legend">
             <div class="legend-item"><div class="dot" style="background:var(--Michelle)"></div>Michelle</div>
             <div class="legend-item"><div class="dot" style="background:var(--Paul)"></div>Paul</div>
             <div class="legend-item"><div class="dot" style="background:var(--Ella)"></div>Ella</div>
             <div class="legend-item"><div class="dot" style="background:var(--Ivy)"></div>Ivy</div>
         </div>
-        <div id="week-grid-container" style="flex:1; display:flex; flex-direction:column; overflow:hidden;"></div>
+        <div id="week-grid-container" style="flex:1; overflow-y: auto; padding-bottom: 20px;"></div>
     </div>
 
     <!-- CHORE TAB -->
     <div id="tasks" class="tab-content">
         <div class="list-header"><h2>Weekly Chore Chart</h2><button class="add-btn" onclick="addTask()">+ New Chore</button></div>
-        <div class="chore-grid" id="chore-grid-container">
-            <!-- Columns injected by JS -->
-        </div>
+        <div class="chore-grid" id="chore-grid-container"></div>
     </div>
 
     <div id="meals" class="tab-content"><div class="list-header"><h2>Meal Planner</h2></div><div id="meal-list" class="list-container"></div></div>
@@ -206,15 +204,14 @@
                 const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=52.19&longitude=-2.22&daily=weathercode,temperature_2m_max&current_weather=true&timezone=Europe%2FLondon');
                 const data = await res.json();
                 const cur = data.current_weather;
-                const info = weatherMap[cur.weathercode] || ["☀️", "Clear"];
                 document.getElementById('temp').innerText = Math.round(cur.temperature) + '°';
-                document.getElementById('w-icon').innerText = info[0];
-                document.getElementById('w-condition').innerText = info[1];
+                document.getElementById('w-icon').innerText = weatherMap[cur.weathercode]?.[0] || "☀️";
+                document.getElementById('w-condition').innerText = weatherMap[cur.weathercode]?.[1] || "Clear";
                 let fHtml = '';
                 const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
                 for(let i=1; i<4; i++) {
                     let d = new Date(); d.setDate(d.getDate() + i);
-                    let icon = weatherMap[data.daily.weathercode[i]] ? weatherMap[data.daily.weathercode[i]][0] : "☀️";
+                    let icon = weatherMap[data.daily.weathercode[i]]?.[0] || "☀️";
                     fHtml += `<div class="forecast-day">${dayNames[d.getDay()]}<br>${icon}<br><b>${Math.round(data.daily.temperature_2m_max[i])}°</b></div>`;
                 }
                 document.getElementById('forecast-cont').innerHTML = fHtml;
@@ -234,16 +231,21 @@
         }
 
         async function fetchEvents(name, tMin, tMax, limit) {
-            let url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(FAMILY_CALENDARS[name])}/events?key=${GOOGLE_API_KEY}&singleEvents=true&orderBy=startTime`;
-            url += `&timeMin=${tMin || new Date().toISOString()}`;
-            if(tMax) url += `&timeMax=${tMax}`;
-            url += `&maxResults=${limit || 5}`;
-            const res = await fetch(url); const data = await res.json(); return data.items || [];
+            try {
+                let url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(FAMILY_CALENDARS[name])}/events?key=${GOOGLE_API_KEY}&singleEvents=true&orderBy=startTime`;
+                url += `&timeMin=${tMin || new Date().toISOString()}`;
+                if(tMax) url += `&timeMax=${tMax}`;
+                url += `&maxResults=${limit || 5}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                if(data.error) return [];
+                return data.items || [];
+            } catch(e) { return []; }
         }
 
         async function buildMonthCalendar() {
             const container = document.getElementById('week-grid-container');
-            container.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%;"><p>Syncing Month...</p></div>';
+            container.innerHTML = '<div style="text-align:center; padding:50px;">Syncing Calendars...</div>';
             
             const y = calDate.getFullYear();
             const m = calDate.getMonth();
@@ -260,17 +262,15 @@
             }
             
             let html = `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:15px;">
                 <button class="add-btn" onclick="changeMonth(-1)">&larr; Prev</button>
                 <h2 style="margin:0;">${startOfMonth.toLocaleDateString('en-GB',{month:'long', year:'numeric'})}</h2>
                 <button class="add-btn" onclick="changeMonth(1)">Next &rarr;</button>
             </div>
-            <div class="week-grid" style="grid-template-columns: repeat(7, 1fr); grid-auto-rows: minmax(90px, auto); align-content: start; height: calc(100% - 70px); overflow-y: auto; padding-bottom: 20px; box-sizing: border-box;">
-            `;
+            <div class="week-grid">`;
             
-            const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            dayNames.forEach(d => {
-                html += `<div style="text-align:center; font-weight:bold; color:var(--dim); font-size:0.8rem; padding-bottom:5px;">${d}</div>`;
+            ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(d => {
+                html += `<div style="text-align:center; font-weight:bold; color:var(--dim); font-size:0.7rem;">${d}</div>`;
             });
             
             let firstDay = startOfMonth.getDay(); 
@@ -281,17 +281,16 @@
             for(let i=1; i<=daysInMonth; i++) {
                 let currentDay = new Date(y, m, i);
                 let isToday = currentDay.toDateString() === new Date().toDateString();
-                html += `<div class="day-col" style="${isToday ? 'border: 2px solid var(--accent);' : ''}">
-                    <div class="day-header" style="${isToday ? 'color: var(--accent); font-weight:bold;' : ''}">${i}</div>
-                    <div style="padding: 2px; display:flex; flex-direction:column; gap:2px; flex:1;">`;
+                html += `<div class="day-col" style="${isToday ? 'border: 1px solid var(--accent);' : ''}">
+                    <div class="day-header" style="${isToday ? 'background: var(--accent); color: white;' : ''}">${i}</div>
+                    <div style="padding: 2px;">`;
                 
                 allEvs.filter(e => e.key === currentDay.toDateString()).forEach(e => {
-                    html += `<div class="cal-event" style="--c:var(--${e.person}); padding:4px 6px; font-size:0.75rem; margin:1px; border-radius:6px;">${e.summary}</div>`;
+                    html += `<div class="cal-event" style="--c:var(--${e.person})">${e.summary}</div>`;
                 });
                 
                 html += `</div></div>`;
             }
-            
             container.innerHTML = html + '</div>';
         }
 
@@ -302,6 +301,7 @@
             for (const name in FAMILY_CALENDARS) {
                 const evs = await fetchEvents(name);
                 const homeCont = document.getElementById(`day-${name}`);
+                if(!homeCont) continue;
                 homeCont.innerHTML = '';
                 let personEvents = evs.filter(e => new Date(e.start.dateTime || e.start.date).toDateString() === today).slice(0,5);
                 personEvents.forEach(e => { homeCont.innerHTML += `<div class="mini-event" style="--c:var(--${name})">${e.summary}</div>`; });
@@ -315,36 +315,29 @@
                 const p = prompt("Assign to: (Michelle, Paul, Ella, or Ivy)");
                 if(p && ['Michelle','Paul','Ella','Ivy'].includes(p)) {
                     db.ref('tasks').push({ text: t, assigned: p, done: false });
-                } else {
-                    alert("Please type a valid name exactly.");
-                }
+                } else { alert("Please type a valid name exactly."); }
             }
         };
         
         db.ref('tasks').on('value', snap => {
             const container = document.getElementById('chore-grid-container');
+            if(!container) return;
             container.innerHTML = '';
             const data = snap.val() || {};
-            
             ['Michelle','Paul','Ella','Ivy'].forEach(name => {
                 let colHtml = `<div class="chore-column" style="--c:var(--${name})"><h3>${name}</h3>`;
                 let stars = 0;
-                
                 Object.keys(data).forEach(id => {
                     if(data[id].assigned === name) {
                         const isDone = data[id].done;
                         if(isDone) stars++;
-                        colHtml += `
-                            <div class="chore-item ${isDone?'done':''}">
-                                <span>${data[id].text}</span>
+                        colHtml += `<div class="chore-item ${isDone?'done':''}"><span>${data[id].text}</span>
                                 <div style="display:flex; gap:10px; margin-top:5px;">
                                     <button style="flex:1; background:${isDone?'#2ecc71':'#444'}; color:white; border:none; border-radius:5px; padding:5px;" onclick="db.ref('tasks/${id}').update({done:${!isDone}})">${isDone?'Done!':'Check'}</button>
                                     <button style="background:none; border:none; color:red;" onclick="db.ref('tasks/${id}').remove()">✕</button>
-                                </div>
-                            </div>`;
+                                </div></div>`;
                     }
                 });
-                
                 colHtml += `<div class="reward-badge">⭐ ${stars} Stars Earned</div></div>`;
                 container.innerHTML += colHtml;
             });
@@ -354,23 +347,19 @@
         window.addNote = () => { const t = prompt("New Note:"); if(t) db.ref('notes').push({ text: t }); };
 
         db.ref('groceries').on('value', snap => {
-            const list = document.getElementById('grocery-list'); list.innerHTML = '';
-            const data = snap.val();
+            const list = document.getElementById('grocery-list'); if(!list) return;
+            list.innerHTML = ''; const data = snap.val();
             for(let id in data) list.innerHTML += `<div class="list-item"><span style="text-decoration:${data[id].done?'line-through':''}" onclick="db.ref('groceries/${id}').update({done:${!data[id].done}})">${data[id].text}</span><button style="background:none; border:none; color:red;" onclick="db.ref('groceries/${id}').remove()">✕</button></div>`;
         });
         db.ref('notes').on('value', snap => {
-            const list = document.getElementById('note-list'); list.innerHTML = '';
-            const data = snap.val(); let last = "No notes";
-            if(data) {
-                Object.keys(data).reverse().forEach(id => {
-                    last = data[id].text;
-                    list.innerHTML += `<div class="list-item"><span>${data[id].text}</span><button style="background:none; border:none; color:red;" onclick="db.ref('notes/${id}').remove()">✕</button></div>`;
-                });
-            }
+            const list = document.getElementById('note-list'); if(!list) return;
+            list.innerHTML = ''; const data = snap.val(); let last = "No notes";
+            if(data) { Object.keys(data).reverse().forEach(id => { last = data[id].text; list.innerHTML += `<div class="list-item"><span>${data[id].text}</span><button style="background:none; border:none; color:red;" onclick="db.ref('notes/${id}').remove()">✕</button></div>`; }); }
             document.getElementById('home-note-preview').innerText = last;
         });
         db.ref('meals').on('value', snap => {
-            const m = snap.val() || {}; const list = document.getElementById('meal-list'); list.innerHTML = '';
+            const m = snap.val() || {}; const list = document.getElementById('meal-list'); if(!list) return;
+            list.innerHTML = '';
             ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day => {
                 list.innerHTML += `<div class="list-item"><div><b>${day}</b><br><small>${m[day] || '---'}</small></div><button class="add-btn" onclick="const n=prompt('Dinner?'); if(n)db.ref('meals/${day}').set(n)">Edit</button></div>`;
             });
