@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
-    <title>Family Hub Pro V26</title>
+    <title>Family Hub Pro V25</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -14,11 +14,13 @@
         :root {
             --bg: #000; --card: #141414; --text: #fff; --dim: #888; --accent: #3498db;
             --Michelle: #e74c3c; --Paul: #3498db; --Ella: #2ecc71; --Ivy: #f1c40f;
-            --Family: #9b59b6; --nav-bg: #050505;
+            --nav-bg: #050505;
         }
         body.light-mode { --bg: #f5f5f7; --card: #ffffff; --text: #1d1d1f; --dim: #86868b; --nav-bg: #ffffff; }
 
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.5s; }
+        
+        #brightness-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10001; background: black; opacity: 0; transition: opacity 2s; }
         
         .tab-content { flex: 1; display: none; overflow: hidden; padding-bottom: 90px; height: 100%; width: 100%; flex-direction: column; }
         .tab-content.active { display: flex; }
@@ -40,36 +42,40 @@
         .home-calendar-strip { grid-column: 1 / span 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; height: 100%; }
         .person-day { background: var(--card); border-radius: 15px; padding: 12px; border-top: 6px solid var(--c); height: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; }
         .person-day h4 { margin: 0 0 2px 0; font-size: 1rem; font-weight: 700; }
-        .mini-event { background: var(--c); color: #fff; font-size: 0.95rem; padding: 8px 10px; border-radius: 10px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* CALENDAR TAB */
-        .calendar-legend { display: flex; justify-content: center; gap: 15px; padding: 10px; border-bottom: 1px solid rgba(128,128,128,0.1); flex-wrap: wrap; background: var(--card); font-size: 0.9rem; }
-        .legend-item { display: flex; align-items: center; gap: 5px; font-weight: 600; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; }
         
-        .cal-nav { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: var(--bg); }
+        .mini-event { background: var(--c); color: #fff; font-size: 0.95rem; padding: 8px 10px; border-radius: 10px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+        /* CALENDAR TAB STYLES */
+        .calendar-legend { display: flex; justify-content: center; gap: 20px; padding: 15px; border-bottom: 1px solid rgba(128,128,128,0.1); flex-wrap: wrap; background: var(--card); }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.1rem; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; }
+        
+        .cal-nav { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--bg); }
         .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; padding: 10px; flex: 1; overflow-y: auto; align-content: start; }
         .day-label { text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--dim); padding-bottom: 5px; }
-        .day-col { background: var(--card); border-radius: 8px; border: 1px solid rgba(128,128,128,0.1); display: flex; flex-direction: column; min-height: 110px; position: relative; }
+        .day-col { background: var(--card); border-radius: 8px; border: 1px solid rgba(128,128,128,0.1); display: flex; flex-direction: column; min-height: 100px; }
         .day-header { text-align: center; padding: 4px; font-size: 0.85rem; border-bottom: 1px solid rgba(128,128,128,0.05); }
-        .cal-event { background: var(--c); color: #fff; padding: 3px 5px; border-radius: 4px; font-size: 0.7rem; margin: 2px; font-weight: 600; line-height: 1.1; overflow: hidden; position: relative; }
-        .delete-ev { position: absolute; right: 2px; top: 0; font-size: 8px; opacity: 0.5; }
+        .cal-event { background: var(--c); color: #fff; padding: 3px 5px; border-radius: 4px; font-size: 0.7rem; margin: 2px; font-weight: 600; line-height: 1.1; overflow: hidden; }
 
-        /* CHORES & LISTS */
+        /* CHORE CHART */
         .chore-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 15px; flex: 1; overflow-y: auto; }
         .chore-column { background: rgba(128,128,128,0.05); border-radius: 20px; padding: 15px; border: 1px solid rgba(128,128,128,0.1); display: flex; flex-direction: column; }
         .chore-column h3 { margin: 0 0 15px 0; text-align: center; color: var(--c); font-size: 1.2rem; border-bottom: 2px solid var(--c); padding-bottom: 10px; }
         .chore-item { background: var(--card); padding: 12px; border-radius: 12px; margin-bottom: 10px; font-size: 0.9rem; border-left: 4px solid var(--c); display: flex; flex-direction: column; gap: 5px; }
-        .chore-item.done { opacity: 0.6; }
+        .chore-item.done { opacity: 0.6; border-left-color: #2ecc71; }
+        .chore-item.done span { text-decoration: line-through; }
+        .reward-badge { margin-top: auto; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 15px; text-align: center; border: 1px dashed gold; color: gold; font-weight: 700; }
+
+        /* LISTS */
         .list-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
         .list-container { overflow-y: auto; padding: 0 20px; flex: 1; }
-        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--card); margin-bottom: 10px; border-radius: 15px; border: 1px solid rgba(128,128,128,0.1); }
-        .add-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 8px 15px; font-weight: 700; cursor: pointer; }
+        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--card); margin-bottom: 10px; border-radius: 15px; border: 1px solid rgba(128,128,128,0.1); font-size: 1.1rem; }
+        .add-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; font-size: 1rem; cursor: pointer; }
 
         .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: var(--nav-bg); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(128,128,128,0.1); z-index: 100; }
         .nav-item { color: var(--dim); text-align: center; flex: 1; cursor: pointer; }
         .nav-icon { font-size: 1.8rem; display: block; }
-        .nav-label { font-size: 0.65rem; font-weight: 700; }
+        .nav-label { font-size: 0.65rem; font-weight: 700; margin-top: 2px; }
         .nav-item.active { color: var(--accent); }
 
         #screensaver { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; background: black; color: white; text-align: center; }
@@ -78,10 +84,15 @@
 </head>
 <body onmousemove="resetTimer()" onclick="resetTimer()" ontouchstart="resetTimer()">
 
+    <div id="brightness-overlay"></div>
+
     <div id="screensaver" onclick="resetTimer()">
-        <h1 id="ss-clock">00:00</h1>
-        <div id="ss-date" style="font-size: 2rem; opacity: 0.8;">...</div>
-        <div id="ss-weather" style="font-size: 2.5rem; margin: 25px 0;">...</div>
+        <div id="ss-info">
+            <h1 id="ss-clock">00:00</h1>
+            <div id="ss-date" style="font-size: 2rem; opacity: 0.8;">...</div>
+            <div id="ss-weather" style="font-size: 2.5rem; margin: 25px 0;">...</div>
+            <div id="ss-agenda"></div>
+        </div>
     </div>
 
     <!-- HOME -->
@@ -96,12 +107,13 @@
                     <div class="weather-forecast" id="forecast-cont"></div>
                 </div>
             </div>
-            <div class="tile"><h3>🍲 Dinner</h3><div id="home-dinner" style="font-size: 1.2rem; color: var(--accent); font-weight: 700;">...</div></div>
+            <div class="tile"><h3>🍲 Dinner</h3><div id="home-dinner" style="font-size: 1.3rem; color: var(--accent); font-weight: 700;">...</div></div>
             <div class="tile">
-                <h3>✨ Fun</h3>
-                <div id="daily-joke" style="font-size: 0.75rem; color: var(--dim);">...</div>
+                <h3>✨ Motivation</h3>
+                <div id="daily-quote" style="font-style: italic; color: var(--accent); font-size: 0.85rem; line-height: 1.2;">"One step at a time."</div>
+                <div id="daily-joke" style="font-size: 0.75rem; border-top: 1px solid rgba(128,128,128,0.1); padding-top:3px; color: var(--dim); margin-top:5px;">...</div>
             </div>
-            <div class="tile" style="grid-column: 1 / span 2;"><h3>📝 Latest Note</h3><div id="home-note-preview">...</div></div>
+            <div class="tile" style="grid-column: 1 / span 2;"><h3>📝 Latest Note</h3><div id="home-note-preview" style="font-size: 1.1rem;">...</div></div>
             <div class="home-calendar-strip">
                 <div class="person-day" style="--c:var(--Michelle)"><h4>Michelle</h4><div id="day-Michelle"></div></div>
                 <div class="person-day" style="--c:var(--Paul)"><h4>Paul</h4><div id="day-Paul"></div></div>
@@ -111,43 +123,41 @@
         </div>
     </div>
 
-    <!-- CALENDAR -->
+    <!-- CALENDAR TAB -->
     <div id="calendar" class="tab-content">
         <div class="calendar-legend">
             <div class="legend-item"><div class="dot" style="background:var(--Michelle)"></div>Michelle</div>
             <div class="legend-item"><div class="dot" style="background:var(--Paul)"></div>Paul</div>
             <div class="legend-item"><div class="dot" style="background:var(--Ella)"></div>Ella</div>
             <div class="legend-item"><div class="dot" style="background:var(--Ivy)"></div>Ivy</div>
-            <div class="legend-item"><div class="dot" style="background:var(--Family)"></div>Hub</div>
         </div>
         <div class="cal-nav">
-            <button class="add-btn" onclick="changeMonth(-1)">&larr;</button>
-            <h2 id="cal-month-title" style="margin:0; font-size: 1.2rem;">Month</h2>
-            <div style="display:flex; gap:10px;">
-                <button class="add-btn" style="background:#9b59b6" onclick="addHubEvent()">+ Add Event</button>
-                <button class="add-btn" onclick="changeMonth(1)">&rarr;</button>
-            </div>
+            <button class="add-btn" onclick="changeMonth(-1)">&larr; Prev</button>
+            <h2 id="cal-month-title" style="margin:0;">Month</h2>
+            <button class="add-btn" onclick="changeMonth(1)">Next &rarr;</button>
         </div>
-        <div id="month-grid-container" class="week-grid"></div>
+        <div id="month-grid-container" class="week-grid">
+            <!-- Grid injected here -->
+        </div>
     </div>
 
-    <!-- CHORES -->
+    <!-- CHORE TAB -->
     <div id="tasks" class="tab-content">
-        <div class="list-header"><h2>Chores</h2><button class="add-btn" onclick="addTask()">+ New</button></div>
+        <div class="list-header"><h2>Weekly Chore Chart</h2><button class="add-btn" onclick="addTask()">+ New Chore</button></div>
         <div class="chore-grid" id="chore-grid-container"></div>
     </div>
 
-    <div id="meals" class="tab-content"><div class="list-header"><h2>Meals</h2></div><div id="meal-list" class="list-container"></div></div>
-    <div id="groceries" class="tab-content"><div class="list-header"><h2>Shopping</h2><button class="add-btn" onclick="addGrocery()">+ Add</button></div><div id="grocery-list" class="list-container"></div></div>
+    <div id="meals" class="tab-content"><div class="list-header"><h2>Meal Planner</h2></div><div id="meal-list" class="list-container"></div></div>
+    <div id="groceries" class="tab-content"><div class="list-header"><h2>Shopping List</h2><button class="add-btn" onclick="addGrocery()">+ Add</button></div><div id="grocery-list" class="list-container"></div></div>
     <div id="notes" class="tab-content"><div class="list-header"><h2>Notes</h2><button class="add-btn" onclick="addNote()">+ Add</button></div><div id="note-list" class="list-container"></div></div>
 
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span><span class="nav-label">HOME</span></div>
-        <div class="nav-item" onclick="switchTab('calendar', this)"><span class="nav-icon">📅</span><span class="nav-label">CAL</span></div>
-        <div class="nav-item" onclick="switchTab('tasks', this)"><span class="nav-icon">✅</span><span class="nav-label">TASKS</span></div>
-        <div class="nav-item" onclick="switchTab('meals', this)"><span class="nav-icon">🍲</span><span class="nav-label">MEAL</span></div>
+        <div class="nav-item" onclick="switchTab('calendar', this)"><span class="nav-icon">📅</span><span class="nav-label">CALENDAR</span></div>
+        <div class="nav-item" onclick="switchTab('tasks', this)"><span class="nav-icon">✅</span><span class="nav-label">CHORES</span></div>
+        <div class="nav-item" onclick="switchTab('meals', this)"><span class="nav-icon">🍲</span><span class="nav-label">MEALS</span></div>
         <div class="nav-item" onclick="switchTab('groceries', this)"><span class="nav-icon">🛒</span><span class="nav-label">SHOP</span></div>
-        <div class="nav-item" onclick="switchTab('notes', this)"><span class="nav-icon">📝</span><span class="nav-label">NOTE</span></div>
+        <div class="nav-item" onclick="switchTab('notes', this)"><span class="nav-icon">📝</span><span class="nav-label">NOTES</span></div>
     </nav>
 
     <script>
@@ -160,69 +170,93 @@
 
         let calDate = new Date();
 
+        const weatherMap = { 0: ["☀️", "Clear"], 1: ["🌤️", "Fair"], 2: ["⛅", "Cloudy"], 3: ["☁️", "Overcast"], 61: ["🌧️", "Rain"], 80: ["🌧️", "Showers"], 95: ["⛈️", "Storm"] };
+        async function fetchWeather() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=52.19&longitude=-2.22&daily=weathercode,temperature_2m_max&current_weather=true&timezone=Europe%2FLondon');
+                const data = await res.json();
+                const cur = data.current_weather;
+                document.getElementById('temp').innerText = Math.round(cur.temperature) + '°';
+                document.getElementById('w-icon').innerText = weatherMap[cur.weathercode]?.[0] || "☀️";
+                document.getElementById('w-condition').innerText = weatherMap[cur.weathercode]?.[1] || "Clear";
+                let fHtml = '';
+                const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+                for(let i=1; i<4; i++) {
+                    let d = new Date(); d.setDate(d.getDate() + i);
+                    let icon = weatherMap[data.daily.weathercode[i]]?.[0] || "☀️";
+                    fHtml += `<div class="forecast-day">${dayNames[d.getDay()]}<br>${icon}<br><b>${Math.round(data.daily.temperature_2m_max[i])}°</b></div>`;
+                }
+                document.getElementById('forecast-cont').innerHTML = fHtml;
+            } catch(e) {}
+        }
+
+        async function fetchFun() {
+            try {
+                const jRes = await fetch('https://v2.jokeapi.dev/joke/Pun,Misc?blacklistFlags=nsfw,religious,political,racist,sexist,explicit&safe-mode&type=single');
+                const jData = await jRes.json();
+                document.getElementById('daily-joke').innerText = jData.joke || "What do you call a fake noodle? An impasta!";
+                const qRes = await fetch('https://type.fit/api/quotes');
+                const qData = await qRes.json();
+                const randomQ = qData[Math.floor(Math.random() * qData.length)];
+                document.getElementById('daily-quote').innerText = `"${randomQ.text}"`;
+            } catch(e) {}
+        }
+
         async function fetchEvents(name, tMin, tMax, limit) {
             try {
-                let url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(FAMILY_CALENDARS[name])}/events?key=${GOOGLE_API_KEY}&singleEvents=true&orderBy=startTime&timeMin=${tMin || new Date().toISOString()}`;
+                let url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(FAMILY_CALENDARS[name])}/events?key=${GOOGLE_API_KEY}&singleEvents=true&orderBy=startTime`;
+                url += `&timeMin=${tMin || new Date().toISOString()}`;
                 if(tMax) url += `&timeMax=${tMax}`;
-                const res = await fetch(url + `&maxResults=${limit || 10}`);
+                url += `&maxResults=${limit || 5}`;
+                const res = await fetch(url);
                 const data = await res.json();
                 return data.items || [];
             } catch(e) { return []; }
         }
 
-        window.addHubEvent = () => {
-            const text = prompt("Event description:");
-            const date = prompt("Date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
-            const who = prompt("Whose event? (Michelle, Paul, Ella, Ivy, or Family)", "Family");
-            if(text && date) {
-                db.ref('hub_events').push({ text, date, who });
-                buildMonthCalendar();
-            }
-        };
-
         async function buildMonthCalendar() {
             const container = document.getElementById('month-grid-container');
-            container.innerHTML = '<div style="grid-column:1/span 7; text-align:center; padding:20px;">Loading...</div>';
+            container.innerHTML = '<div style="grid-column: 1 / span 7; text-align:center; padding:40px; color:var(--accent);">Syncing Month...</div>';
             
-            const y = calDate.getFullYear(); const m = calDate.getMonth();
+            const y = calDate.getFullYear();
+            const m = calDate.getMonth();
             const startOfMonth = new Date(y, m, 1);
             const endOfMonth = new Date(y, m + 1, 0, 23, 59, 59);
+            
             document.getElementById('cal-month-title').innerText = startOfMonth.toLocaleDateString('en-GB',{month:'long', year:'numeric'});
 
             let allEvs = [];
-            // Get Google Events
-            for (const name in FAMILY_CALENDARS) {
-                const evs = await fetchEvents(name, startOfMonth.toISOString(), endOfMonth.toISOString(), 50);
-                evs.forEach(e => {
-                    let d = new Date(e.start.dateTime || e.start.date);
-                    allEvs.push({ summary: e.summary, person: name, key: d.toDateString() });
-                });
-            }
-            // Get Hub (Firebase) Events
-            const hubSnap = await db.ref('hub_events').once('value');
-            const hubData = hubSnap.val() || {};
-            Object.keys(hubData).forEach(id => {
-                const e = hubData[id];
-                const d = new Date(e.date);
-                if(d >= startOfMonth && d <= endOfMonth) {
-                    allEvs.push({ summary: '🏠 ' + e.text, person: e.who || 'Family', key: d.toDateString(), id: id });
+            try {
+                for (const name in FAMILY_CALENDARS) {
+                    const evs = await fetchEvents(name, startOfMonth.toISOString(), endOfMonth.toISOString(), 100);
+                    evs.forEach(e => {
+                        let d = new Date(e.start.dateTime || e.start.date);
+                        allEvs.push({ ...e, person: name, key: d.toDateString() });
+                    });
                 }
-            });
-
+            } catch(e) { console.error("Cal Load Error", e); }
+            
             let html = '';
-            ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(d => html += `<div class="day-label">${d}</div>`);
-            let firstDay = startOfMonth.getDay(); let blanks = firstDay === 0 ? 6 : firstDay - 1;
+            ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(d => {
+                html += `<div class="day-label">${d}</div>`;
+            });
+            
+            let firstDay = startOfMonth.getDay(); 
+            let blanks = firstDay === 0 ? 6 : firstDay - 1;
             for(let i=0; i<blanks; i++) html += `<div></div>`;
             
-            for(let i=1; i<=endOfMonth.getDate(); i++) {
+            let daysInMonth = endOfMonth.getDate();
+            for(let i=1; i<=daysInMonth; i++) {
                 let currentDay = new Date(y, m, i);
                 let isToday = currentDay.toDateString() === new Date().toDateString();
                 html += `<div class="day-col" style="${isToday ? 'border: 2px solid var(--accent);' : ''}">
                     <div class="day-header" style="${isToday ? 'background: var(--accent); color: white;' : ''}">${i}</div>
-                    <div>`;
+                    <div style="flex:1; overflow:hidden;">`;
+                
                 allEvs.filter(e => e.key === currentDay.toDateString()).forEach(e => {
-                    html += `<div class="cal-event" style="--c:var(--${e.person})">${e.summary}${e.id ? `<span class="delete-ev" onclick="db.ref('hub_events/${e.id}').remove(); buildMonthCalendar();">✕</span>` : ''}</div>`;
+                    html += `<div class="cal-event" style="--c:var(--${e.person})">${e.summary}</div>`;
                 });
+                
                 html += `</div></div>`;
             }
             container.innerHTML = html;
@@ -230,38 +264,99 @@
 
         window.changeMonth = (dir) => { calDate.setMonth(calDate.getMonth() + dir); buildMonthCalendar(); };
 
-        // Reuse standard Hub functions from previous versions
-        window.switchTab = (id, el) => {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.add('active'); el.classList.add('active');
-            if(id === 'calendar') buildMonthCalendar();
-        };
+        async function updateAgendas() {
+            const today = new Date().toDateString();
+            for (const name in FAMILY_CALENDARS) {
+                const evs = await fetchEvents(name);
+                const homeCont = document.getElementById(`day-${name}`);
+                if(!homeCont) continue;
+                homeCont.innerHTML = '';
+                let personEvents = evs.filter(e => new Date(e.start.dateTime || e.start.date).toDateString() === today).slice(0,5);
+                personEvents.forEach(e => { homeCont.innerHTML += `<div class="mini-event" style="--c:var(--${name})">${e.summary}</div>`; });
+                if(homeCont.innerHTML === '') homeCont.innerHTML = '<span style="color:var(--dim); font-size:0.75rem;">Clear</span>';
+            }
+        }
 
+        window.addTask = () => { 
+            const t = prompt("What is the chore?"); 
+            if(t) {
+                const p = prompt("Assign to: Michelle, Paul, Ella, or Ivy");
+                if(p && FAMILY_CALENDARS[p]) {
+                    db.ref('tasks').push({ text: t, assigned: p, done: false });
+                } else { alert("Type a valid name (e.g. Ella)"); }
+            }
+        };
+        
         db.ref('tasks').on('value', snap => {
-            const container = document.getElementById('chore-grid-container'); if(!container) return;
-            container.innerHTML = ''; const data = snap.val() || {};
+            const container = document.getElementById('chore-grid-container');
+            if(!container) return;
+            container.innerHTML = '';
+            const data = snap.val() || {};
             ['Michelle','Paul','Ella','Ivy'].forEach(name => {
                 let colHtml = `<div class="chore-column" style="--c:var(--${name})"><h3>${name}</h3>`;
                 let stars = 0;
                 Object.keys(data).forEach(id => {
                     if(data[id].assigned === name) {
-                        if(data[id].done) stars++;
-                        colHtml += `<div class="chore-item ${data[id].done?'done':''}" onclick="db.ref('tasks/${id}').update({done:${!data[id].done}})">${data[id].text}</div>`;
+                        const isDone = data[id].done;
+                        if(isDone) stars++;
+                        colHtml += `<div class="chore-item ${isDone?'done':''}"><span>${data[id].text}</span>
+                                <div style="display:flex; gap:10px; margin-top:5px;">
+                                    <button style="flex:1; background:${isDone?'#2ecc71':'#444'}; color:white; border:none; border-radius:5px; padding:5px;" onclick="db.ref('tasks/${id}').update({done:${!isDone}})">${isDone?'Done':'Check'}</button>
+                                    <button style="background:none; border:none; color:red;" onclick="db.ref('tasks/${id}').remove()">✕</button>
+                                </div></div>`;
                     }
                 });
-                container.innerHTML += colHtml + `<div>⭐ ${stars}</div></div>`;
+                colHtml += `<div class="reward-badge">⭐ ${stars} Stars</div></div>`;
+                container.innerHTML += colHtml;
             });
         });
+
+        window.addGrocery = () => { const t = prompt("Add to Shop:"); if(t) db.ref('groceries').push({ text: t, done: false }); };
+        window.addNote = () => { const t = prompt("New Note:"); if(t) db.ref('notes').push({ text: t }); };
+
+        db.ref('groceries').on('value', snap => {
+            const list = document.getElementById('grocery-list'); if(!list) return;
+            list.innerHTML = ''; const data = snap.val();
+            for(let id in data) list.innerHTML += `<div class="list-item"><span style="text-decoration:${data[id].done?'line-through':''}" onclick="db.ref('groceries/${id}').update({done:${!data[id].done}})">${data[id].text}</span><button style="background:none; border:none; color:red;" onclick="db.ref('groceries/${id}').remove()">✕</button></div>`;
+        });
+        db.ref('notes').on('value', snap => {
+            const list = document.getElementById('note-list'); if(!list) return;
+            list.innerHTML = ''; const data = snap.val(); let last = "No notes";
+            if(data) { Object.keys(data).reverse().forEach(id => { last = data[id].text; list.innerHTML += `<div class="list-item"><span>${data[id].text}</span><button style="background:none; border:none; color:red;" onclick="db.ref('notes/${id}').remove()">✕</button></div>`; }); }
+            document.getElementById('home-note-preview').innerText = last;
+        });
+        db.ref('meals').on('value', snap => {
+            const m = snap.val() || {}; const list = document.getElementById('meal-list'); if(!list) return;
+            list.innerHTML = '';
+            ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day => {
+                list.innerHTML += `<div class="list-item"><div><b>${day}</b><br><small>${m[day] || '---'}</small></div><button class="add-btn" onclick="const n=prompt('Dinner?'); if(n)db.ref('meals/${day}').set(n)">Edit</button></div>`;
+            });
+            document.getElementById('home-dinner').innerText = m[new Date().toLocaleDateString('en-US',{weekday:'long'})] || "Not Set";
+        });
+
+        window.switchTab = (id, el) => {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const target = document.getElementById(id);
+            if(target) target.classList.add('active'); 
+            el.classList.add('active');
+            if(id === 'calendar') { calDate = new Date(); buildMonthCalendar(); }
+        };
 
         setInterval(() => {
             const n = new Date();
             document.getElementById('clock').innerText = n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
             document.getElementById('date-string').innerText = n.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+            const h = n.getHours();
+            if (h >= 7 && h < 19) document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode');
         }, 1000);
 
-        function resetTimer() { document.getElementById('screensaver').style.display = 'none'; }
-        buildMonthCalendar();
+        let idle = 0;
+        function resetTimer() { idle = 0; document.getElementById('screensaver').style.display = 'none'; }
+        setInterval(() => { idle++; if(idle >= 30) document.getElementById('screensaver').style.display = 'flex'; }, 10000);
+
+        fetchWeather(); updateAgendas(); fetchFun();
+        setInterval(() => { updateAgendas(); fetchWeather(); fetchFun(); }, 600000);
     </script>
 </body>
 </html>
