@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json">
-    <title>Family Hub Pro V22</title>
+    <title>Family Hub Pro V23</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -87,17 +87,15 @@
         .list-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--card); margin-bottom: 10px; border-radius: 15px; border: 1px solid rgba(128,128,128,0.1); font-size: 1.1rem; }
         .add-btn { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; font-size: 1rem; cursor: pointer; }
 
-        /* CALENDAR TAB BOLDER LEGEND */
         .calendar-legend { display: flex; justify-content: center; gap: 30px; padding: 20px; border-bottom: 1px solid rgba(128,128,128,0.1); }
         .legend-item { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.4rem; }
         .dot { width: 18px; height: 18px; border-radius: 50%; }
         
         .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; padding: 10px; flex: 1; }
-        .day-col { background: var(--card); border-radius: 12px; border: 1px solid rgba(128,128,128,0.1); overflow: hidden; }
+        .day-col { background: var(--card); border-radius: 12px; border: 1px solid rgba(128,128,128,0.1); overflow: hidden; display: flex; flex-direction: column; }
         .day-header { text-align: center; padding: 10px 2px; border-bottom: 1px solid rgba(128,128,128,0.1); background: rgba(255,255,255,0.03); }
         .cal-event { background: var(--c); color: #fff; padding: 8px; border-radius: 8px; font-size: 0.85rem; margin: 6px 4px; font-weight: 600; line-height: 1.2; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
 
-        /* CHORE CHART STYLING */
         .chore-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 15px; flex: 1; overflow-y: auto; }
         .chore-column { background: rgba(128,128,128,0.05); border-radius: 20px; padding: 15px; border: 1px solid rgba(128,128,128,0.1); display: flex; flex-direction: column; }
         .chore-column h3 { margin: 0 0 15px 0; text-align: center; color: var(--c); font-size: 1.2rem; border-bottom: 2px solid var(--c); padding-bottom: 10px; }
@@ -161,14 +159,14 @@
     </div>
 
     <!-- CALENDAR TAB -->
-    <div id="calendar" class="tab-content">
+    <div id="calendar" class="tab-content" style="display:none; flex-direction:column; height:100%;">
         <div class="calendar-legend">
             <div class="legend-item"><div class="dot" style="background:var(--Michelle)"></div>Michelle</div>
             <div class="legend-item"><div class="dot" style="background:var(--Paul)"></div>Paul</div>
             <div class="legend-item"><div class="dot" style="background:var(--Ella)"></div>Ella</div>
             <div class="legend-item"><div class="dot" style="background:var(--Ivy)"></div>Ivy</div>
         </div>
-        <div id="week-grid-container" style="flex:1;"></div>
+        <div id="week-grid-container" style="flex:1; display:flex; flex-direction:column; overflow:hidden;"></div>
     </div>
 
     <!-- CHORE TAB -->
@@ -199,6 +197,8 @@
         const firebaseConfig = { apiKey: "AIzaSyCBb3Uu--Sr21o65TUddUBIPfLfQwZsV_o", authDomain: "familyhub-fb842.firebaseapp.com", databaseURL: "https://familyhub-fb842-default-rtdb.firebaseio.com", projectId: "familyhub-fb842", appId: "1:459204148820:web:9808286292bbb322e3b7c1" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        let calDate = new Date();
 
         const weatherMap = { 0: ["☀️", "Clear"], 1: ["🌤️", "Fair"], 2: ["⛅", "Cloudy"], 3: ["☁️", "Overcast"], 61: ["🌧️", "Rain"], 80: ["🌧️", "Showers"], 95: ["⛈️", "Storm"] };
         async function fetchWeather() {
@@ -233,33 +233,69 @@
             } catch(e) {}
         }
 
-        async function fetchEvents(name) {
-            const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(FAMILY_CALENDARS[name])}/events?key=${GOOGLE_API_KEY}&timeMin=${new Date().toISOString()}&singleEvents=true&orderBy=startTime&maxResults=5`;
+        async function fetchEvents(name, tMin, tMax, limit) {
+            let url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(FAMILY_CALENDARS[name])}/events?key=${GOOGLE_API_KEY}&singleEvents=true&orderBy=startTime`;
+            url += `&timeMin=${tMin || new Date().toISOString()}`;
+            if(tMax) url += `&timeMax=${tMax}`;
+            url += `&maxResults=${limit || 5}`;
             const res = await fetch(url); const data = await res.json(); return data.items || [];
         }
 
-        async function buildWeeklyCalendar() {
+        async function buildMonthCalendar() {
             const container = document.getElementById('week-grid-container');
-            container.innerHTML = '<p style="text-align:center; padding:50px;">Syncing...</p>';
+            container.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%;"><p>Syncing Month...</p></div>';
+            
+            const y = calDate.getFullYear();
+            const m = calDate.getMonth();
+            const startOfMonth = new Date(y, m, 1);
+            const endOfMonth = new Date(y, m + 1, 0, 23, 59, 59);
+            
             let allEvs = [];
             for (const name in FAMILY_CALENDARS) {
-                const evs = await fetchEvents(name);
+                const evs = await fetchEvents(name, startOfMonth.toISOString(), endOfMonth.toISOString(), 100);
                 evs.forEach(e => {
                     let d = new Date(e.start.dateTime || e.start.date);
                     allEvs.push({ ...e, person: name, key: d.toDateString() });
                 });
             }
-            const days = []; for(let i=0; i<7; i++) { let d = new Date(); d.setDate(d.getDate()+i); days.push(d); }
-            let html = '<div class="week-grid">';
-            days.forEach(day => {
-                html += `<div class="day-col"><div class="day-header"><small>${day.toLocaleDateString('en-GB',{weekday:'short'})}</small><br><b>${day.getDate()}</b></div>`;
-                allEvs.filter(e => e.key === day.toDateString()).forEach(e => {
-                    html += `<div class="cal-event" style="--c:var(--${e.person})">${e.summary}</div>`;
-                });
-                html += '</div>';
+            
+            let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 20px;">
+                <button class="add-btn" onclick="changeMonth(-1)">&larr; Prev</button>
+                <h2 style="margin:0;">${startOfMonth.toLocaleDateString('en-GB',{month:'long', year:'numeric'})}</h2>
+                <button class="add-btn" onclick="changeMonth(1)">Next &rarr;</button>
+            </div>
+            <div class="week-grid" style="grid-template-columns: repeat(7, 1fr); grid-auto-rows: minmax(90px, auto); align-content: start; height: calc(100% - 70px); overflow-y: auto; padding-bottom: 20px; box-sizing: border-box;">
+            `;
+            
+            const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            dayNames.forEach(d => {
+                html += `<div style="text-align:center; font-weight:bold; color:var(--dim); font-size:0.8rem; padding-bottom:5px;">${d}</div>`;
             });
+            
+            let firstDay = startOfMonth.getDay(); 
+            let blanks = firstDay === 0 ? 6 : firstDay - 1;
+            for(let i=0; i<blanks; i++) html += `<div></div>`;
+            
+            let daysInMonth = endOfMonth.getDate();
+            for(let i=1; i<=daysInMonth; i++) {
+                let currentDay = new Date(y, m, i);
+                let isToday = currentDay.toDateString() === new Date().toDateString();
+                html += `<div class="day-col" style="${isToday ? 'border: 2px solid var(--accent);' : ''}">
+                    <div class="day-header" style="${isToday ? 'color: var(--accent); font-weight:bold;' : ''}">${i}</div>
+                    <div style="padding: 2px; display:flex; flex-direction:column; gap:2px; flex:1;">`;
+                
+                allEvs.filter(e => e.key === currentDay.toDateString()).forEach(e => {
+                    html += `<div class="cal-event" style="--c:var(--${e.person}); padding:4px 6px; font-size:0.75rem; margin:1px; border-radius:6px;">${e.summary}</div>`;
+                });
+                
+                html += `</div></div>`;
+            }
+            
             container.innerHTML = html + '</div>';
         }
+
+        window.changeMonth = (dir) => { calDate.setMonth(calDate.getMonth() + dir); buildMonthCalendar(); };
 
         async function updateAgendas() {
             const today = new Date().toDateString();
@@ -273,7 +309,6 @@
             }
         }
 
-        // UPDATED TASK SYSTEM
         window.addTask = () => { 
             const t = prompt("What is the chore?"); 
             if(t) {
@@ -346,7 +381,7 @@
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active'); el.classList.add('active');
-            if(id === 'calendar') buildWeeklyCalendar();
+            if(id === 'calendar') { calDate = new Date(); buildMonthCalendar(); }
         };
 
         setInterval(() => {
